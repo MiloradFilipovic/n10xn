@@ -1,6 +1,34 @@
-import type { Edge, Node } from '@vue-flow/core'
+export type Node = {
+  id: string
+  type?: 'input' | 'output' | 'special' | 'default'
+  position: { x: number; y: number }
+  data: Record<string, any>
+  class?: string
+}
+
+export type Connection = {
+  id: string
+  source: string
+  target: string
+  type?: string
+  data?: Record<string, any>
+}
 
 export type Diagram = {
+  id: string
+  name: string
+  createdAt: string
+  updatedAt: string
+  deleted: boolean
   nodes: Node[]
-  edges: Edge[]
+  connections: Connection[]
+  authorId: string
+}
+
+export type User = {
+  id: string
+  email: string
+  password: string
+  firstName: string
+  lastName: string
 }

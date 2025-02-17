@@ -1,89 +1,110 @@
-import type { Diagram } from '@/types/canvas'
-import { useVueFlow, type Edge, type Node } from '@vue-flow/core'
+import type { Diagram, Node } from '@/types/canvas'
 import { defineStore } from 'pinia'
-import { computed, ref } from 'vue'
+import { ref } from 'vue'
+import { DIAGRAMS } from '../../db/diagrams'
 
 export const useCanvasStore = defineStore('CANVAS_STORE', () => {
-  const vueFlow = useVueFlow('1')
+  const allDiagrams = ref<Record<string, Diagram>>({})
+  const currentDiagramId = ref<string | null>(null)
+  const selectedNodes = ref<string[]>([])
+  const selectedConnections = ref<string[]>([])
 
-  const diagram = ref<Diagram>({
-    nodes: [
-      // an input node, specified by using `type: 'input'`
-      {
-        id: '1',
-        type: 'input',
-        position: { x: 250, y: 105 },
-        // all nodes can have a data object containing any data you want to pass to the node
-        // a label can property can be used for default nodes
-        data: { label: 'Node 1' },
-        class: 'vue-flow__node-custom',
-      },
+  const init = () => {
+    loadDiagrams()
+  }
 
-      // default node, you can omit `type: 'default'` as it's the fallback type
-      {
-        id: '2',
-        position: { x: 100, y: 200 },
-        data: { label: 'Node 2' },
-        class: 'vue-flow__node-custom',
-      },
+  const loadDiagrams = () => {
+    DIAGRAMS.forEach((diagram) => {
+      allDiagrams.value[diagram.id] = diagram
+    })
+  }
 
-      // An output node, specified by using `type: 'output'`
-      {
-        id: '3',
-        type: 'output',
-        position: { x: 400, y: 500 },
-        data: { label: 'Node 3' },
-        class: 'vue-flow__node-custom',
-      },
+  const getById = (id: string) => {
+    return allDiagrams.value[id]
+  }
 
-      // this is a custom node
-      // we set it by using a custom type name we choose, in this example `special`
-      // the name can be freely chosen, there are no restrictions as long as it's a string
-      {
-        id: '4',
-        type: 'special', // <-- this is the custom node type name
-        position: { x: 500, y: 200 },
-        data: {
-          label: 'Node 4',
-          hello: 'world',
-        },
-        class: 'vue-flow__node-custom',
-      },
-    ],
-    edges: [
-      // default bezier edge
-      // consists of an edge id, source node id and target node id
-      {
-        id: 'e1->2',
-        source: '1',
-        target: '2',
-      },
+  const currentDiagram = () => {
+    if (!currentDiagramId.value) return null
+    return getById(currentDiagramId.value)
+  }
 
-      // set `animated: true` to create an animated edge path
-      {
-        id: 'e2->3',
-        source: '2',
-        target: '3',
-        animated: true,
-      },
+  const addNode = (node: Node) => {
+    const diagram = currentDiagram()
+    if (!diagram) return
 
-      // a custom edge, specified by using a custom type name
-      // we choose `type: 'special'` for this example
-      {
-        id: 'e3->4',
-        type: 'special',
-        source: '3',
-        target: '4',
+    diagram.nodes.push(node)
+  }
 
-        // all edges can have a data object containing any data you want to pass to the edge
-        data: {
-          hello: 'world',
-        },
-      },
-    ],
-  })
+  const addConnection = (connection: any) => {
+    const diagram = currentDiagram()
+    if (!diagram) return
+
+    diagram.connections.push(connection)
+  }
+
+  const removeNode = (nodeId: string) => {
+    const diagram = currentDiagram()
+    if (!diagram) return
+
+    const index = diagram.nodes.findIndex((node) => node.id === nodeId)
+    if (index === -1) return
+
+    diagram.nodes.splice(index, 1)
+  }
+
+  const removeConnection = (connectionId: string) => {
+    const diagram = currentDiagram()
+    if (!diagram) return
+
+    const index = diagram.connections.findIndex((connection) => connection.id === connectionId)
+    if (index === -1) return
+
+    diagram.connections.splice(index, 1)
+  }
+
+  const moveNode = (nodeId: string, position: { x: number; y: number }) => {
+    const diagram = currentDiagram()
+    if (!diagram) return
+
+    const node = diagram.nodes.find((node) => node.id === nodeId)
+    if (!node) return
+
+    node.position = position
+  }
+
+  const removeSelectedNodes = () => {
+    const diagram = currentDiagram()
+    if (!diagram) return
+
+    selectedNodes.value.forEach((nodeId) => {
+      removeNode(nodeId)
+    })
+  }
+
+  const removeSelectedConnections = () => {
+    const diagram = currentDiagram()
+    if (!diagram) return
+
+    selectedConnections.value.forEach((connectionId) => {
+      removeConnection(connectionId)
+    })
+  }
 
   return {
-    diagram,
+    allDiagrams,
+    currentDiagramId,
+    currentDiagram,
+    init,
+    getById,
+    loadDiagrams,
+    addNode,
+    addConnection,
+    removeNode,
+    removeConnection,
+    moveNode,
+    selectedNodes,
+    selectedConnections,
+    removeSelectedNodes,
+    removeSelectedConnections,
   }
 })

@@ -1,16 +1,25 @@
 <script setup lang="ts">
+import { onMounted, ref } from 'vue'
 import Canvas from './components/Canvas.vue'
 import Toolbar from './components/Toolbar.vue'
 import { useCanvasStore } from './stores/canvas.store'
 
 const canvasStore = useCanvasStore()
+const currentDiagramId = ref<string | null>(null)
+
+onMounted(() => {
+  canvasStore.init()
+  currentDiagramId.value = Object.keys(canvasStore.allDiagrams)[0]
+  canvasStore.currentDiagramId = currentDiagramId.value
+})
 </script>
 
 <template>
-  <div :class="$style.app">
+  <div v-if="currentDiagramId" :class="$style.app">
     <Toolbar />
-    <Canvas :diagram="canvasStore.diagram" />
+    <Canvas :diagram-id="currentDiagramId" />
   </div>
+  <div v-else>Loading...</div>
 </template>
 
 <style module lang="scss">

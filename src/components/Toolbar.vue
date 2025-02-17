@@ -1,11 +1,15 @@
 <script setup lang="ts">
-import { useVueFlow, type Node } from '@vue-flow/core'
+import type { Node } from '@/types/canvas'
 import { useCanvasStore } from '../stores/canvas.store'
+import { computed } from 'vue'
 
-const { addNodes, getSelectedNodes, removeNodes } = useVueFlow()
 const canvasStore = useCanvasStore()
 
+const currentDiagram = computed(() => canvasStore.currentDiagram())
+const selectedNodes = computed(() => canvasStore.selectedNodes)
+
 const onAddButtonClick = () => {
+  if (!currentDiagram.value) return
   const newNode: Node = {
     id: Date.now().toString(),
     type: 'default',
@@ -13,22 +17,22 @@ const onAddButtonClick = () => {
       x: Math.random() * 1000,
       y: Math.random() * 1000,
     },
-    data: { label: `Node ${canvasStore.diagram.nodes.length + 1}` },
+    data: { label: `Node ${currentDiagram.value.nodes.length + 1}` },
     class: 'vue-flow__node-custom',
   }
-  addNodes([newNode])
+  canvasStore.addNode(newNode)
 }
 
 const removeSelectedNodes = () => {
-  const selectedNodes = getSelectedNodes.value
-  removeNodes(selectedNodes)
+  canvasStore.removeSelectedNodes()
 }
 </script>
 
 <template>
-  <div :class="$style.toolbar">
+  <div v-if="currentDiagram" :class="$style.toolbar">
+    <div>{{ currentDiagram.name }}</div>
     <button @click="onAddButtonClick">Add Node</button>
-    <button @click="removeSelectedNodes" :disabled="getSelectedNodes.length === 0">
+    <button @click="removeSelectedNodes" :disabled="selectedNodes.length === 0">
       Delete Nodes
     </button>
   </div>
@@ -41,6 +45,7 @@ const removeSelectedNodes = () => {
   display: flex;
   gap: 1em;
   padding: 0 1em;
+  font-family: Arial, Helvetica, sans-serif;
   background-color: #f0f0f0;
   align-items: center;
 }

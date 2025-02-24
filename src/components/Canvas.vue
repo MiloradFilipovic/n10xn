@@ -1,10 +1,12 @@
 <script setup lang="ts">
-import { useVueFlow, VueFlow, type Edge, type Node } from '@vue-flow/core'
+import { useVueFlow, VueFlow, type Edge, type Node, Position } from '@vue-flow/core'
+import { Background } from '@vue-flow/background'
 
 import SpecialNode from './nodes/SpecialNode.vue'
 import SpecialEdge from './edges/SpecialEdge.vue'
 import { computed, watch } from 'vue'
 import { useCanvasStore } from '@/stores/canvas.store'
+import { useUIStore } from '@/stores/ui.store'
 
 type Props = {
   diagramId: string
@@ -13,6 +15,7 @@ type Props = {
 const props = defineProps<Props>()
 
 const canvasStore = useCanvasStore()
+const uiStore = useUIStore()
 const { getSelectedNodes, onNodeDragStop, getSelectedEdges } = useVueFlow()
 
 const diagram = computed(() => canvasStore.allDiagrams[props.diagramId])
@@ -24,7 +27,12 @@ const canvasNodes = computed((): Node[] => {
       id: node.id,
       type: node.type,
       position: node.position,
+      height: 100,
+      width: 100,
+      label: node.data.name,
       data: node.data,
+      targetPosition: Position.Left,
+      sourcePosition: Position.Right,
       class: 'vue-flow__node-custom',
     }
   })
@@ -50,6 +58,10 @@ onNodeDragStop((event) => {
   canvasStore.moveNode(id, { x: newPosition.x, y: newPosition.y })
 })
 
+const onCanvasClick = (event: MouseEvent) => {
+  uiStore.lastClickedPosition = { x: event.layerX, y: event.layerY }
+}
+
 watch([getSelectedNodes, getSelectedEdges], ([nextNodes, nextEdges]) => {
   const selectedNodeIds = nextNodes.map((node) => node.id)
   const selectedEdgeIds = nextEdges.map((edge) => edge.id)
@@ -60,7 +72,8 @@ watch([getSelectedNodes, getSelectedEdges], ([nextNodes, nextEdges]) => {
 
 <template>
   <div :class="$style['canvas-container']">
-    <VueFlow v-model:nodes="canvasNodes" :edges="canvasEdges">
+    <VueFlow v-model:nodes="canvasNodes" :edges="canvasEdges" @click="onCanvasClick">
+      <Background />
       <template #node-special="specialNodeProps">
         <SpecialNode v-bind="specialNodeProps" />
       </template>

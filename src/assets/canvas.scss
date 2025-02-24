@@ -1,4 +1,6 @@
 .vue-flow__node-custom {
+  display: flex;
+  align-items: center;
   background: white;
   color: purple;
   border: 1px solid purple;
@@ -6,7 +8,7 @@
   box-shadow: 0 0 0 1px purple;
   padding: 8px;
   font-family: Arial, Helvetica, sans-serif;
-  font-size: large;
+  font-size: 0.8em;
 }
 
 .vue-flow__node {

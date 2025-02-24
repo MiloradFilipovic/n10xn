@@ -2,6 +2,7 @@ import type { Diagram, Node } from '@/types/canvas'
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import { DIAGRAMS } from '../../db/diagrams'
+import type { NodeType } from '@/types/common'
 
 export const useCanvasStore = defineStore('CANVAS_STORE', () => {
   const allDiagrams = ref<Record<string, Diagram>>({})
@@ -28,11 +29,22 @@ export const useCanvasStore = defineStore('CANVAS_STORE', () => {
     return getById(currentDiagramId.value)
   }
 
-  const addNode = (node: Node) => {
+  const addNode = (nodeType: NodeType, position?: { x: number; y: number }) => {
     const diagram = currentDiagram()
     if (!diagram) return
 
-    diagram.nodes.push(node)
+    const newNodeName = `${nodeType.name} ${diagram.nodes.length + 1}`
+    const newNode: Node = {
+      id: new Date().getTime().toString(),
+      type: nodeType.type,
+      position: position || { x: 10, y: 10 },
+      data: {
+        ...nodeType.parameters,
+        name: newNodeName,
+      },
+    }
+
+    diagram.nodes.push(newNode)
   }
 
   const addConnection = (connection: any) => {

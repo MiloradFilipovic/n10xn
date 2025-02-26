@@ -64,7 +64,6 @@ export const useCanvasStore = defineStore('CANVAS_STORE', () => {
     diagram.nodes.push(newNode)
   }
 
-  // TODO: Add proper type for connection
   const addConnection = (connection: Connection) => {
     const diagram = currentDiagram()
     if (!diagram) return

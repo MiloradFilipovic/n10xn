@@ -17,7 +17,14 @@ const props = defineProps<Props>()
 
 const canvasStore = useCanvasStore()
 const uiStore = useUIStore()
-const { getSelectedNodes, onNodeDragStop, getSelectedEdges, onConnect } = useVueFlow()
+const {
+  getSelectedNodes,
+  onNodeDragStop,
+  getSelectedEdges,
+  onConnect,
+  onNodesChange,
+  onEdgesChange,
+} = useVueFlow()
 
 // TODO: Move this to a composable
 const userAgent = ref(navigator.userAgent.toLowerCase())
@@ -85,6 +92,22 @@ onConnect((event) => {
 const onCanvasClick = (event: MouseEvent) => {
   uiStore.lastClickedPosition = { x: event.layerX, y: event.layerY }
 }
+
+onNodesChange((updates) => {
+  updates.forEach((update) => {
+    if (update.type === 'remove') {
+      canvasStore.removeNode(update.id)
+    }
+  })
+})
+
+onEdgesChange((updates) => {
+  updates.forEach((update) => {
+    if (update.type === 'remove') {
+      canvasStore.removeConnection(update.id)
+    }
+  })
+})
 
 onKeyDown(panningKeyCode.value, switchToPanningMode, {
   dedupe: true,

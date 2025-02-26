@@ -4,9 +4,10 @@ import { Background } from '@vue-flow/background'
 
 import SpecialNode from './nodes/SpecialNode.vue'
 import SpecialEdge from './edges/SpecialEdge.vue'
-import { computed, watch } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { useCanvasStore } from '@/stores/canvas.store'
 import { useUIStore } from '@/stores/ui.store'
+import { onKeyDown, onKeyUp } from '@vueuse/core'
 
 type Props = {
   diagramId: string
@@ -17,6 +18,15 @@ const props = defineProps<Props>()
 const canvasStore = useCanvasStore()
 const uiStore = useUIStore()
 const { getSelectedNodes, onNodeDragStop, getSelectedEdges } = useVueFlow()
+
+// TODO: Move this to a composable
+const userAgent = ref(navigator.userAgent.toLowerCase())
+const isMacOs = ref(userAgent.value.includes('macintosh'))
+const controlKeyCode = ref(isMacOs.value ? 'Meta' : 'Control')
+
+const panningKeyCode = ref<string[]>([' ', controlKeyCode.value])
+const panningMouseButton = ref<number[]>([1])
+const selectionKeyCode = ref<string | true | null>(true)
 
 const diagram = computed(() => canvasStore.allDiagrams[props.diagramId])
 
@@ -52,6 +62,16 @@ const canvasEdges = computed((): Edge[] => {
   })
 })
 
+function switchToPanningMode() {
+  selectionKeyCode.value = null
+  panningMouseButton.value = [0, 1]
+}
+
+function switchToSelectionMode() {
+  selectionKeyCode.value = true
+  panningMouseButton.value = [1]
+}
+
 onNodeDragStop((event) => {
   const id = event.node.id
   const newPosition = event.node.computedPosition
@@ -61,6 +81,12 @@ onNodeDragStop((event) => {
 const onCanvasClick = (event: MouseEvent) => {
   uiStore.lastClickedPosition = { x: event.layerX, y: event.layerY }
 }
+
+onKeyDown(panningKeyCode.value, switchToPanningMode, {
+  dedupe: true,
+})
+
+onKeyUp(panningKeyCode.value, switchToSelectionMode)
 
 watch([getSelectedNodes, getSelectedEdges], ([nextNodes, nextEdges]) => {
   const selectedNodeIds = nextNodes.map((node) => node.id)
@@ -72,7 +98,15 @@ watch([getSelectedNodes, getSelectedEdges], ([nextNodes, nextEdges]) => {
 
 <template>
   <div :class="$style['canvas-container']">
-    <VueFlow v-model:nodes="canvasNodes" :edges="canvasEdges" @click="onCanvasClick">
+    <VueFlow
+      v-model:nodes="canvasNodes"
+      :edges="canvasEdges"
+      :pan-on-drag="panningMouseButton"
+      :selection-key-code="selectionKeyCode"
+      :zoom-activation-key-code="panningKeyCode"
+      :pan-activation-key-code="panningKeyCode"
+      @click="onCanvasClick"
+    >
       <Background />
       <template #node-special="specialNodeProps">
         <SpecialNode v-bind="specialNodeProps" />

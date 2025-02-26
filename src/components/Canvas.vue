@@ -2,12 +2,11 @@
 import { useVueFlow, VueFlow, type Edge, type Node, Position } from '@vue-flow/core'
 import { Background } from '@vue-flow/background'
 
-import SpecialNode from './nodes/SpecialNode.vue'
-import SpecialEdge from './edges/SpecialEdge.vue'
 import { computed, ref, watch } from 'vue'
 import { useCanvasStore } from '@/stores/canvas.store'
 import { useUIStore } from '@/stores/ui.store'
 import { onKeyDown, onKeyUp } from '@vueuse/core'
+import IfNode from './nodes/IfNode.vue'
 
 type Props = {
   diagramId: string
@@ -60,8 +59,10 @@ const canvasEdges = computed((): Edge[] => {
   return diagram.value.connections.map((connection) => {
     return {
       id: connection.id,
-      source: connection.source,
-      target: connection.target,
+      source: connection.sourceId,
+      sourceHandle: connection.sourceHandle,
+      target: connection.targetId,
+      targetHandle: connection.targetHandle,
       type: connection.type,
       data: connection.data,
       class: 'vue-flow__edge-custom',
@@ -86,7 +87,11 @@ onNodeDragStop((event) => {
 })
 
 onConnect((event) => {
-  canvasStore.connectNodes(event.source, event.target)
+  console.log('onConnect', event)
+  canvasStore.connectNodes(
+    { id: event.source, handle: event.sourceHandle ?? undefined },
+    { id: event.target, handle: event.targetHandle ?? undefined },
+  )
 })
 
 const onCanvasClick = (event: MouseEvent) => {
@@ -135,12 +140,8 @@ watch([getSelectedNodes, getSelectedEdges], ([nextNodes, nextEdges]) => {
       @click="onCanvasClick"
     >
       <Background />
-      <template #node-special="specialNodeProps">
-        <SpecialNode v-bind="specialNodeProps" />
-      </template>
-
-      <template #edge-special="specialEdgeProps">
-        <SpecialEdge v-bind="specialEdgeProps" />
+      <template #node-if="specialNodeProps">
+        <IfNode v-bind="specialNodeProps" />
       </template>
     </VueFlow>
   </div>

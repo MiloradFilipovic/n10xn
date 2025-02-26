@@ -1,6 +1,6 @@
 export type Node = {
   id: string
-  type?: 'input' | 'output' | 'special' | 'default'
+  type?: 'input' | 'output' | 'if' | 'default'
   position: { x: number; y: number }
   data: Record<string, any>
   class?: string
@@ -8,8 +8,10 @@ export type Node = {
 
 export type Connection = {
   id: string
-  source: string
-  target: string
+  sourceId: string
+  sourceHandle?: string
+  targetId: string
+  targetHandle?: string
   type?: string
   data?: Record<string, any>
 }

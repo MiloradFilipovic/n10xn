@@ -55,7 +55,7 @@ const currentDiagram = computed(() => canvasStore.currentDiagram())
 
 .user {
   display: flex;
-  gap: 1em;
+  gap: 0.3em;
   align-items: center;
 }
 

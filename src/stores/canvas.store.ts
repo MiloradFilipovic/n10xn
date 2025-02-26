@@ -119,13 +119,18 @@ export const useCanvasStore = defineStore('CANVAS_STORE', () => {
     })
   }
 
-  const connectNodes = (fromNodeId: string, toNodeId: string) => {
+  const connectNodes = (
+    source: { id: string; handle?: string },
+    target: { id: string; handle?: string },
+  ) => {
     const diagram = currentDiagram()
     if (!diagram) return
     const connection: Connection = {
-      id: `${fromNodeId}_${toNodeId}`,
-      source: fromNodeId,
-      target: toNodeId,
+      id: `${source.id}_${target.id}`,
+      sourceId: source.id,
+      sourceHandle: source.handle,
+      targetId: target.id,
+      targetHandle: target.handle,
     }
     addConnection(connection)
   }

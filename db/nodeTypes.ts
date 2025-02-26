@@ -34,4 +34,14 @@ export const NODE_TYPES: NodeType[] = [
     },
     icon: 'mdi-web',
   },
+  {
+    id: 'if',
+    type: 'if',
+    name: 'If',
+    description: 'Introduce a conditional branch',
+    parameters: {
+      condition: 'Condition to check',
+    },
+    icon: 'mdi-weather-night',
+  },
 ]

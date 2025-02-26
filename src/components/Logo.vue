@@ -5,6 +5,8 @@
 <style module lang="scss">
 .container {
   display: flex;
+  position: relative;
+  bottom: 2px;
   font-weight: bold;
   font-size: 1.4em;
   align-content: center;

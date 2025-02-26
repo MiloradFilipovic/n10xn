@@ -17,7 +17,7 @@ const props = defineProps<Props>()
 
 const canvasStore = useCanvasStore()
 const uiStore = useUIStore()
-const { getSelectedNodes, onNodeDragStop, getSelectedEdges } = useVueFlow()
+const { getSelectedNodes, onNodeDragStop, getSelectedEdges, onConnect } = useVueFlow()
 
 // TODO: Move this to a composable
 const userAgent = ref(navigator.userAgent.toLowerCase())
@@ -76,6 +76,10 @@ onNodeDragStop((event) => {
   const id = event.node.id
   const newPosition = event.node.computedPosition
   canvasStore.moveNode(id, { x: newPosition.x, y: newPosition.y })
+})
+
+onConnect((event) => {
+  canvasStore.connectNodes(event.source, event.target)
 })
 
 const onCanvasClick = (event: MouseEvent) => {

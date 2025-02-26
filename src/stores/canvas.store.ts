@@ -1,8 +1,9 @@
-import type { Diagram, Node } from '@/types/canvas'
+import type { Connection, Diagram, Node } from '@/types/canvas'
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import { DIAGRAMS } from '../../db/diagrams'
 import type { NodeType } from '@/types/common'
+import { useUsersStore } from './users.store'
 
 export const useCanvasStore = defineStore('CANVAS_STORE', () => {
   const allDiagrams = ref<Record<string, Diagram>>({})
@@ -18,6 +19,22 @@ export const useCanvasStore = defineStore('CANVAS_STORE', () => {
     DIAGRAMS.forEach((diagram) => {
       allDiagrams.value[diagram.id] = diagram
     })
+  }
+
+  const createNewDiagram = (name: string, authorId: string) => {
+    const newDiagramId = new Date().getTime().toString()
+    const newDiagram: Diagram = {
+      id: newDiagramId,
+      name,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      deleted: false,
+      authorId,
+      nodes: [],
+      connections: [],
+    }
+    allDiagrams.value[newDiagramId] = newDiagram
+    currentDiagramId.value = newDiagramId
   }
 
   const getById = (id: string) => {
@@ -47,7 +64,8 @@ export const useCanvasStore = defineStore('CANVAS_STORE', () => {
     diagram.nodes.push(newNode)
   }
 
-  const addConnection = (connection: any) => {
+  // TODO: Add proper type for connection
+  const addConnection = (connection: Connection) => {
     const diagram = currentDiagram()
     if (!diagram) return
 
@@ -102,8 +120,20 @@ export const useCanvasStore = defineStore('CANVAS_STORE', () => {
     })
   }
 
+  const connectNodes = (fromNodeId: string, toNodeId: string) => {
+    const diagram = currentDiagram()
+    if (!diagram) return
+    const connection: Connection = {
+      id: `${fromNodeId}_${toNodeId}`,
+      source: fromNodeId,
+      target: toNodeId,
+    }
+    addConnection(connection)
+  }
+
   return {
     allDiagrams,
+    createNewDiagram,
     currentDiagramId,
     currentDiagram,
     init,
@@ -118,5 +148,6 @@ export const useCanvasStore = defineStore('CANVAS_STORE', () => {
     selectedConnections,
     removeSelectedNodes,
     removeSelectedConnections,
+    connectNodes,
   }
 })

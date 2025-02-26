@@ -21,8 +21,8 @@ onMounted(() => {
   usersStore.init()
   usersStore.currentUserId = '1'
   canvasStore.init()
-  currentDiagramId.value = Object.keys(canvasStore.allDiagrams)[0]
-  canvasStore.currentDiagramId = currentDiagramId.value
+  canvasStore.createNewDiagram('Untitled', '1')
+  currentDiagramId.value = canvasStore.currentDiagramId
 })
 
 const onNodeTypeSelected = (nodeType: NodeType) => {

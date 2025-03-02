@@ -1,13 +1,11 @@
 <script setup lang="ts">
-import type { NodeProps } from '@vue-flow/core'
-import { Position, Handle } from '@vue-flow/core'
 import { computed, defineProps } from 'vue'
+import { Position, Handle, type NodeProps } from '@vue-flow/core'
 import { NODE_TYPES } from '../../../db/nodeTypes'
 
 type props = {
   data: NodeProps
 }
-
 const props = defineProps<props>()
 
 const nodeType = computed(() => {
@@ -21,14 +19,8 @@ const nodeType = computed(() => {
     <div :class="$style['node-icon']">
       <font-awesome-icon :icon="nodeType.icon" size="3x" fixed-width />
     </div>
-    <Handle type="target" :position="Position.Left" />
-    <Handle id="source-true" type="source" :position="Position.Right" style="top: 20px" />
-    <Handle
-      id="source-false"
-      type="source"
-      :position="Position.Right"
-      style="bottom: 20px; top: auto"
-    />
+    <Handle id="source" type="source" :position="Position.Right" />
+    <Handle id="target" type="target" :position="Position.Left" />
   </div>
 </template>
 

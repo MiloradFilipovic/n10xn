@@ -1,9 +1,9 @@
 export type NodeType = {
   id: string
-  type?: 'input' | 'output' | 'if' | 'default'
+  type: 'trigger' | 'regular' | 'if'
   name: string
   description: string
   // TODO: parameters need to have types
   parameters: Record<string, any>
-  icon?: string
+  icon: string[]
 }

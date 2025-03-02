@@ -2,11 +2,14 @@
 import { useVueFlow, VueFlow, type Edge, type Node, Position } from '@vue-flow/core'
 import { Background } from '@vue-flow/background'
 
-import { computed, ref, watch } from 'vue'
+import { computed, markRaw, ref, watch } from 'vue'
 import { useCanvasStore } from '@/stores/canvas.store'
 import { useUIStore } from '@/stores/ui.store'
 import { onKeyDown, onKeyUp } from '@vueuse/core'
 import IfNode from './nodes/IfNode.vue'
+import TriggerNode from './nodes/TriggerNode.vue'
+import { NODE_TYPES } from '../../db/nodeTypes'
+import RegularNode from './nodes/RegularNode.vue'
 
 type Props = {
   diagramId: string
@@ -140,8 +143,14 @@ watch([getSelectedNodes, getSelectedEdges], ([nextNodes, nextEdges]) => {
       @click="onCanvasClick"
     >
       <Background />
-      <template #node-if="specialNodeProps">
-        <IfNode v-bind="specialNodeProps" />
+      <template #node-if="props">
+        <IfNode :data="props" />
+      </template>
+      <template #node-trigger="props">
+        <TriggerNode :data="props" />
+      </template>
+      <template #node-regular="props">
+        <RegularNode :data="props" />
       </template>
     </VueFlow>
   </div>

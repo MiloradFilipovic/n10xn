@@ -1,6 +1,6 @@
 export type Node = {
   id: string
-  type?: 'input' | 'output' | 'if' | 'default'
+  type?: 'trigger' | 'if' | 'regular'
   position: { x: number; y: number }
   data: Record<string, any>
   class?: string

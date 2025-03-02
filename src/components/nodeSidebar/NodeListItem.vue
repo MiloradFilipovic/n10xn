@@ -10,6 +10,9 @@ const props = defineProps<Props>()
 
 <template>
   <li :class="$style['node-type-item']">
+    <div :class="$style['node-type-icon']">
+      <font-awesome-icon :icon="nodeType.icon" size="xl" fixed-width />
+    </div>
     <div :class="$style['node-type-name']">{{ nodeType.name }}</div>
     <div :class="$style['node-type-description']">{{ nodeType.description }}</div>
   </li>
@@ -17,6 +20,9 @@ const props = defineProps<Props>()
 
 <style module lang="scss">
 .node-type-item {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  grid-template-rows: auto auto;
   padding: 0.5em;
   border-radius: 4px;
   cursor: pointer;
@@ -25,14 +31,31 @@ const props = defineProps<Props>()
 
   &:hover {
     border-color: #414244;
+
+    .node-type-icon {
+      color: #414244;
+    }
   }
+}
+
+.node-type-icon {
+  grid-column: 1;
+  grid-row: 1 / span 2;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 0.5em;
 }
 
 .node-type-name {
   color: #414244;
+  grid-column: 2;
+  grid-row: 1;
 }
 
 .node-type-description {
+  grid-column: 2;
+  grid-row: 2;
   font-size: 0.8em;
 }
 </style>

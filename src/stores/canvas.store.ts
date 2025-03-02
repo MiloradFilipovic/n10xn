@@ -58,6 +58,7 @@ export const useCanvasStore = defineStore('CANVAS_STORE', () => {
       data: {
         ...nodeType.parameters,
         name: newNodeName,
+        type: nodeType.id,
       },
     }
 

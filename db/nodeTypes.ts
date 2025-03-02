@@ -3,27 +3,27 @@ import { type NodeType } from '../src/types/common'
 export const NODE_TYPES: NodeType[] = [
   {
     id: 'manual-trigger',
-    type: 'input',
+    type: 'trigger',
     name: 'Manual trigger',
     description: 'Manually trigger the workflow',
     parameters: {
       notice: 'This node does not have any parameters',
     },
-    icon: 'mdi-hand',
+    icon: ['fas', 'arrow-pointer'],
   },
   {
     id: 'cron-trigger',
-    type: 'input',
+    type: 'trigger',
     name: 'Cron trigger',
     description: 'Trigger the workflow on a schedule',
     parameters: {
       cron: 'Cron expression',
     },
-    icon: 'mdi-clock',
+    icon: ['fas', 'clock'],
   },
   {
     id: 'http-request',
-    type: 'default',
+    type: 'regular',
     name: 'HTTP request',
     description: 'Make an HTTP request',
     parameters: {
@@ -32,7 +32,7 @@ export const NODE_TYPES: NodeType[] = [
       headers: 'Request headers',
       body: 'Request body',
     },
-    icon: 'mdi-web',
+    icon: ['fas', 'globe'],
   },
   {
     id: 'if',
@@ -42,6 +42,6 @@ export const NODE_TYPES: NodeType[] = [
     parameters: {
       condition: 'Condition to check',
     },
-    icon: 'mdi-weather-night',
+    icon: ['fas', 'signs-post'],
   },
 ]

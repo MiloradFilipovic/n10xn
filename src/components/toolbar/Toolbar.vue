@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import type { Node } from '@/types/canvas'
 import { useCanvasStore } from '../../stores/canvas.store'
 import { computed } from 'vue'
 import { useUsersStore } from '@/stores/users.store'
@@ -20,7 +19,7 @@ const currentDiagram = computed(() => canvasStore.currentDiagram())
         <Logo />
         <DiagramName
           v-if="currentDiagram"
-          :diagram="currentDiagram"
+          :name="currentDiagram.name"
           @diagram-name-updated="canvasStore.renameCurrentDiagram"
         />
       </div>

@@ -4,7 +4,7 @@ import { onClickOutside } from '@vueuse/core'
 import { nextTick, ref, useTemplateRef } from 'vue'
 
 type Props = {
-  diagram: Diagram
+  name: string
 }
 
 const props = defineProps<Props>()
@@ -30,7 +30,7 @@ const switchToEditMode = () => {
 
 const switchToLabelMode = () => {
   editMode.value = false
-  if (nameInput.value) {
+  if (nameInput.value && nameInput.value.value !== '') {
     emit('diagram-name-updated', nameInput.value.value)
   }
 }
@@ -39,12 +39,13 @@ const switchToLabelMode = () => {
 <template>
   <div :class="$style.container">
     <div v-if="!editMode" :class="$style.label" @click="switchToEditMode">
-      {{ props.diagram.name }}
+      {{ props.name }}
     </div>
     <input
       v-else
       ref="nameInput"
       :class="$style['name-input']"
+      :value="props.name"
       tabindex="0"
       @keydown.enter="switchToLabelMode"
     />

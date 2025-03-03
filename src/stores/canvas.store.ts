@@ -50,7 +50,7 @@ export const useCanvasStore = defineStore('CANVAS_STORE', () => {
     const diagram = currentDiagram()
     if (!diagram) return
 
-    const newNodeName = `${nodeType.name} ${diagram.nodes.length + 1}`
+    const newNodeName = `${getUniqueNodeName(nodeType)}`
     const newNode: Node = {
       id: new Date().getTime().toString(),
       type: nodeType.type,
@@ -63,6 +63,14 @@ export const useCanvasStore = defineStore('CANVAS_STORE', () => {
     }
 
     diagram.nodes.push(newNode)
+  }
+
+  const getUniqueNodeName = (nodeType: NodeType) => {
+    const diagram = currentDiagram()
+    if (!diagram) return
+    const otherNodesOfType = diagram.nodes.filter((node) => node.data.type === nodeType.id)
+    if (otherNodesOfType.length === 0) return nodeType.name
+    return `${nodeType.name} ${otherNodesOfType.length}`
   }
 
   const addConnection = (connection: Connection) => {

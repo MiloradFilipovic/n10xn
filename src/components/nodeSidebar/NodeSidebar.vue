@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useNodeTypesStore } from '@/stores/nodeTypes.store'
-import NodeTypeItem from './nodeSidebar/NodeListItem.vue'
+import NodeTypeItem from '@/components/nodeSidebar/NodeListItem.vue'
 import type { NodeType } from '@/types/common'
 
 const nodeTypesStore = useNodeTypesStore()

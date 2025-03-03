@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
 import Canvas from '@/components/Canvas.vue'
-import Toolbar from '@/components/Toolbar.vue'
-import NodeSidebar from '@/components/NodeSidebar.vue'
+import Toolbar from '@/components/toolbar/Toolbar.vue'
+import NodeSidebar from '@/components/nodeSidebar/NodeSidebar.vue'
 import { useCanvasStore } from '@/stores/canvas.store'
 import { useUsersStore } from '@/stores/users.store'
 import { useNodeTypesStore } from '@/stores/nodeTypes.store'

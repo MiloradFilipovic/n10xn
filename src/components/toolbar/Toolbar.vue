@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import type { Node } from '@/types/canvas'
-import { useCanvasStore } from '../stores/canvas.store'
+import { useCanvasStore } from '../../stores/canvas.store'
 import { computed } from 'vue'
 import { useUsersStore } from '@/stores/users.store'
-import Logo from './Logo.vue'
+import Logo from '@/components/toolbar/Logo.vue'
 
 const canvasStore = useCanvasStore()
 const usersStore = useUsersStore()

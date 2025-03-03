@@ -10,6 +10,7 @@ import IfNode from './nodes/IfNode.vue'
 import TriggerNode from './nodes/TriggerNode.vue'
 import { NODE_TYPES } from '../../db/nodeTypes'
 import RegularNode from './nodes/RegularNode.vue'
+import { useDevice } from '@/composables/useDevice'
 
 type Props = {
   diagramId: string
@@ -27,13 +28,9 @@ const {
   onNodesChange,
   onEdgesChange,
 } = useVueFlow()
+const device = useDevice()
 
-// TODO: Move this to a composable
-const userAgent = ref(navigator.userAgent.toLowerCase())
-const isMacOs = ref(userAgent.value.includes('macintosh'))
-const controlKeyCode = ref(isMacOs.value ? 'Meta' : 'Control')
-
-const panningKeyCode = ref<string[]>([' ', controlKeyCode.value])
+const panningKeyCode = ref<string[]>([' ', device.controlKeyCode.value])
 const panningMouseButton = ref<number[]>([1])
 const selectionKeyCode = ref<string | true | null>(true)
 

@@ -3,10 +3,10 @@
   align-items: center;
   justify-content: center;
   background: white;
-  color: purple;
-  border: 1px solid purple;
+  color: $color_primary;
+  border: 1px solid $color_primary;
   border-radius: 4px;
-  box-shadow: 0 0 0 1px purple;
+  box-shadow: 0 0 0 1px $color_primary;
   padding: 8px;
   font-family: Arial, Helvetica, sans-serif;
   font-size: 0.8em;

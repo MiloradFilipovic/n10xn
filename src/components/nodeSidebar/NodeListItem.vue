@@ -27,13 +27,13 @@ const props = defineProps<Props>()
   border-radius: 4px;
   cursor: pointer;
   transition: background-color 0.2s;
-  border: 1px solid #ccc;
+  border: 1px solid $color_medium;
 
   &:hover {
-    border-color: #414244;
+    border-color: $color_dark;
 
     .node-type-icon {
-      color: #414244;
+      color: $color_dark;
     }
   }
 }
@@ -48,7 +48,7 @@ const props = defineProps<Props>()
 }
 
 .node-type-name {
-  color: #414244;
+  color: $color_primary;
   grid-column: 2;
   grid-row: 1;
 }

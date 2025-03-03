@@ -39,10 +39,6 @@ const onNodeTypeSelected = (nodeType: NodeType) => {
   <div v-else>Loading...</div>
 </template>
 
-<style>
-@import './assets/main.scss';
-</style>
-
 <style module lang="scss">
 .app {
   width: 100%;

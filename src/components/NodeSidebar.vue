@@ -26,7 +26,7 @@ const emit = defineEmits({
 <style module lang="scss">
 .container {
   padding: 1em;
-  border: 1px solid #ccc;
+  border: 1px solid $color_medium;
   border-radius: 4px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   background-color: #fff;

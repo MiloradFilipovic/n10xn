@@ -10,6 +10,6 @@
   font-weight: bold;
   font-size: 1.4em;
   align-content: center;
-  color: #ed3e98;
+  color: $color_dark;
 }
 </style>

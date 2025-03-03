@@ -15,9 +15,9 @@ const currentDiagram = computed(() => canvasStore.currentDiagram())
 <template>
   <div :class="$style.toolbar">
     <div :class="$style.controls">
-      <div :class="$style.logo">
+      <div :class="$style['main-content']">
         <Logo />
-        <div v-if="currentDiagram">{{ currentDiagram.name }}</div>
+        <div v-if="currentDiagram" :class="$style['diagram-name']">{{ currentDiagram.name }}</div>
       </div>
     </div>
     <div :class="$style.user">
@@ -34,7 +34,7 @@ const currentDiagram = computed(() => canvasStore.currentDiagram())
   display: flex;
   gap: 1em;
   padding: 1em;
-  border: 1px solid #ccc;
+  border: 1px solid $color_medium;
   border-radius: 4px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   background-color: #fff;
@@ -42,12 +42,16 @@ const currentDiagram = computed(() => canvasStore.currentDiagram())
   justify-content: space-between;
 }
 
+.diagram-name {
+  color: $color_primary;
+}
+
 .controls {
   display: flex;
   gap: 1em;
 }
 
-.logo {
+.main-content {
   display: flex;
   gap: 0.5em;
   align-items: center;
@@ -57,11 +61,13 @@ const currentDiagram = computed(() => canvasStore.currentDiagram())
   display: flex;
   gap: 0.3em;
   align-items: center;
+  color: $color_primary;
 }
 
 .avatar {
   width: 30px;
   height: 30px;
+  color: $color_dark;
   font-size: 0.8em;
   border-radius: 50%;
   background-color: #ccc;

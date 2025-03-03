@@ -40,11 +40,16 @@ const nodeType = computed(() => {
   justify-content: center;
 }
 
+.node-icon {
+  color: $color_medium;
+}
+
 .node-name {
   position: absolute;
   top: 110%;
   display: block;
   width: 100%;
   text-align: center;
+  color: $color_medium;
 }
 </style>

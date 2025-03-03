@@ -1,8 +1,11 @@
+@forward 'variables';
+@use 'variables' as *;
+
 body {
   overflow: hidden;
 }
 
 #app {
   font-family: Arial, Helvetica, sans-serif;
-  color: #71747a;
+  color: $color_medium;
 }

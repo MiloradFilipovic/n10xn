@@ -4,6 +4,7 @@ import { useCanvasStore } from '../../stores/canvas.store'
 import { computed } from 'vue'
 import { useUsersStore } from '@/stores/users.store'
 import Logo from '@/components/toolbar/Logo.vue'
+import DiagramName from './DiagramName.vue'
 
 const canvasStore = useCanvasStore()
 const usersStore = useUsersStore()
@@ -17,7 +18,11 @@ const currentDiagram = computed(() => canvasStore.currentDiagram())
     <div :class="$style.controls">
       <div :class="$style['main-content']">
         <Logo />
-        <div v-if="currentDiagram" :class="$style['diagram-name']">{{ currentDiagram.name }}</div>
+        <DiagramName
+          v-if="currentDiagram"
+          :diagram="currentDiagram"
+          @diagram-name-updated="canvasStore.renameCurrentDiagram"
+        />
       </div>
     </div>
     <div :class="$style.user">
@@ -40,10 +45,6 @@ const currentDiagram = computed(() => canvasStore.currentDiagram())
   background-color: #fff;
   align-items: center;
   justify-content: space-between;
-}
-
-.diagram-name {
-  color: $color_primary;
 }
 
 .controls {

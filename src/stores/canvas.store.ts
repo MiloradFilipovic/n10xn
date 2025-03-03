@@ -144,6 +144,12 @@ export const useCanvasStore = defineStore('CANVAS_STORE', () => {
     addConnection(connection)
   }
 
+  const renameCurrentDiagram = (name: string) => {
+    const diagram = currentDiagram()
+    if (!diagram) return
+    diagram.name = name
+  }
+
   return {
     allDiagrams,
     createNewDiagram,
@@ -162,5 +168,6 @@ export const useCanvasStore = defineStore('CANVAS_STORE', () => {
     removeSelectedNodes,
     removeSelectedConnections,
     connectNodes,
+    renameCurrentDiagram,
   }
 })

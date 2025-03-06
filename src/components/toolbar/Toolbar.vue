@@ -16,7 +16,7 @@ const currentDiagram = computed(() => canvasStore.currentDiagram())
   <div :class="$style.toolbar">
     <div :class="$style.controls">
       <div :class="$style['main-content']">
-        <Logo />
+        <Logo size="small" />
         <DiagramName
           v-if="currentDiagram"
           :name="currentDiagram.name"
@@ -37,7 +37,7 @@ const currentDiagram = computed(() => canvasStore.currentDiagram())
 .toolbar {
   display: flex;
   gap: 1em;
-  padding: 1em;
+  padding: 0.6em 1em;
   border: 1px solid $color_medium;
   border-radius: 4px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);

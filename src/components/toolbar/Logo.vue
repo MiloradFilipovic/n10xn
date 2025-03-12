@@ -21,7 +21,7 @@ withDefaults(defineProps<Props>(), {
   bottom: 2px;
   font-weight: bold;
   align-content: center;
-  color: $color_dark;
+  color: $color_primary;
 
   &.small {
     font-size: 1.4em;
@@ -30,6 +30,7 @@ withDefaults(defineProps<Props>(), {
     }
 
     .n {
+      color: $color_primary;
       padding: 2px;
     }
   }
@@ -38,6 +39,14 @@ withDefaults(defineProps<Props>(), {
   }
   &.large {
     font-size: 3em;
+    .tenX {
+      padding: 6px;
+    }
+
+    .n {
+      position: relative;
+      top: 6px;
+    }
   }
 }
 

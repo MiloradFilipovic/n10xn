@@ -2,7 +2,7 @@
 import { useVueFlow, VueFlow, type Edge, type Node, Position } from '@vue-flow/core'
 import { Background } from '@vue-flow/background'
 
-import { computed, markRaw, ref, watch } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { useCanvasStore } from '@/stores/canvas.store'
 import { useUIStore } from '@/stores/ui.store'
 import { onKeyDown, onKeyUp } from '@vueuse/core'
@@ -11,7 +11,6 @@ import TriggerNode from './nodes/TriggerNode.vue'
 import RegularNode from './nodes/RegularNode.vue'
 import { useDevice } from '@/composables/useDevice'
 import { NODE_TYPES } from '../../db/nodeTypes'
-import type { NodeType } from '@/types/common'
 import { useNodeTypesStore } from '@/stores/nodeTypes.store'
 
 type Props = {

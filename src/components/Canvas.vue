@@ -8,9 +8,11 @@ import { useUIStore } from '@/stores/ui.store'
 import { onKeyDown, onKeyUp } from '@vueuse/core'
 import IfNode from './nodes/IfNode.vue'
 import TriggerNode from './nodes/TriggerNode.vue'
-import { NODE_TYPES } from '../../db/nodeTypes'
 import RegularNode from './nodes/RegularNode.vue'
 import { useDevice } from '@/composables/useDevice'
+import { NODE_TYPES } from '../../db/nodeTypes'
+import type { NodeType } from '@/types/common'
+import { useNodeTypesStore } from '@/stores/nodeTypes.store'
 
 type Props = {
   diagramId: string
@@ -20,6 +22,7 @@ const props = defineProps<Props>()
 
 const canvasStore = useCanvasStore()
 const uiStore = useUIStore()
+const nodeTypesStore = useNodeTypesStore()
 const {
   getSelectedNodes,
   onNodeDragStop,
@@ -27,6 +30,7 @@ const {
   onConnect,
   onNodesChange,
   onEdgesChange,
+  onEdgeContextMenu,
 } = useVueFlow()
 const device = useDevice()
 
@@ -87,7 +91,6 @@ onNodeDragStop((event) => {
 })
 
 onConnect((event) => {
-  console.log('onConnect', event)
   canvasStore.connectNodes(
     { id: event.source, handle: event.sourceHandle ?? undefined },
     { id: event.target, handle: event.targetHandle ?? undefined },
@@ -112,6 +115,14 @@ onEdgesChange((updates) => {
       canvasStore.removeConnection(update.id)
     }
   })
+})
+
+onEdgeContextMenu((event) => {
+  console.log(event)
+
+  // TODO: Make this prettier
+  const httpRequestNodeType = nodeTypesStore.allNodeTypes[NODE_TYPES[2].id]
+  canvasStore.addNodeOnEdge(httpRequestNodeType, event.edge, event.event.clientX)
 })
 
 onKeyDown(panningKeyCode.value, switchToPanningMode, {

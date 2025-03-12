@@ -4,6 +4,7 @@ import { ref } from 'vue'
 import { DIAGRAMS } from '../../db/diagrams'
 import type { NodeType } from '@/types/common'
 import { useUsersStore } from './users.store'
+import type { Edge } from '@vue-flow/core'
 
 export const useCanvasStore = defineStore('CANVAS_STORE', () => {
   const allDiagrams = ref<Record<string, Diagram>>({})
@@ -144,6 +145,39 @@ export const useCanvasStore = defineStore('CANVAS_STORE', () => {
     addConnection(connection)
   }
 
+  const addNodeOnEdge = (nodeType: NodeType, edge: Edge, xPosition: number) => {
+    const distance = 50
+    const diagram = currentDiagram()
+    if (!diagram) return
+    const sourceNode = diagram.nodes.find((node) => node.id === edge.source)
+    const targetNode = diagram.nodes.find((node) => node.id === edge.target)
+    if (!sourceNode || !targetNode) return
+    removeConnection(edge.id)
+    const newNodeName = `${getUniqueNodeName(nodeType)}`
+    const newNode: Node = {
+      id: new Date().getTime().toString(),
+      type: nodeType.type,
+      position: {
+        x: xPosition - distance,
+        y: (sourceNode.position.y + targetNode.position.y) / 2,
+      },
+      data: {
+        ...nodeType.parameters,
+        name: newNodeName,
+        type: nodeType.id,
+      },
+    }
+    diagram.nodes.push(newNode)
+    connectNodes({ id: sourceNode.id }, { id: newNode.id })
+    connectNodes({ id: newNode.id }, { id: targetNode.id })
+    // And we also want to push downstream nodes to the right by 100px
+    diagram.nodes
+      .filter((node) => node.position.x > newNode.position.x)
+      .forEach((node) => {
+        moveNode(node.id, { x: node.position.x + distance * 2, y: node.position.y })
+      })
+  }
+
   const renameCurrentDiagram = (name: string) => {
     const diagram = currentDiagram()
     if (!diagram) return
@@ -169,5 +203,6 @@ export const useCanvasStore = defineStore('CANVAS_STORE', () => {
     removeSelectedConnections,
     connectNodes,
     renameCurrentDiagram,
+    addNodeOnEdge,
   }
 })

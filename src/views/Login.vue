@@ -2,7 +2,7 @@
 import Logo from '@/components/toolbar/Logo.vue'
 import { useUsersStore } from '@/stores/users.store'
 import { Background } from '@vue-flow/background'
-import { ref } from 'vue'
+import { onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 
 const router = useRouter()
@@ -21,6 +21,12 @@ const login = () => {
     router.push('/home')
   }
 }
+
+onMounted(() => {
+  if (usersStore.isLoggedIn) {
+    router.push({ name: 'home' })
+  }
+})
 </script>
 
 <template>

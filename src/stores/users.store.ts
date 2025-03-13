@@ -1,7 +1,7 @@
 import type { User } from '@/types/canvas'
 import { USERS } from '../../db/users'
 import { defineStore } from 'pinia'
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 
 export const useUsersStore = defineStore('USERS_STORE', () => {
   const allUsers = ref<Record<string, User>>({})
@@ -21,10 +21,12 @@ export const useUsersStore = defineStore('USERS_STORE', () => {
     return allUsers.value[id]
   }
 
-  const currentUser = () => {
+  const currentUser = computed(() => {
     if (!currentUserId.value) return null
     return getById(currentUserId.value)
-  }
+  })
+
+  const isLoggedIn = computed(() => !!currentUserId.value)
 
   const login = (email: string, password: string) => {
     const user = USERS.find((user) => user.email === email && user.password === password)
@@ -35,10 +37,6 @@ export const useUsersStore = defineStore('USERS_STORE', () => {
 
   const logout = () => {
     currentUserId.value = null
-  }
-
-  const isLoggedIn = () => {
-    return !!currentUserId.value
   }
 
   return {

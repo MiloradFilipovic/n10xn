@@ -15,7 +15,7 @@ import {
 import { createWebHistory, createRouter } from 'vue-router'
 
 import App from './App.vue'
-import DiagramList from './views/DiagramList.vue'
+import DiagramList from './views/Home.vue'
 import Editor from './views/Editor.vue'
 import Login from './views/Login.vue'
 import { useUsersStore } from './stores/users.store'
@@ -29,20 +29,6 @@ const routes = [
 const router = createRouter({
   history: createWebHistory(),
   routes,
-})
-
-router.beforeEach(async (to, from) => {
-  const usersStore = useUsersStore()
-  if (to.meta.onlyAuth === true) {
-    if (!usersStore.isLoggedIn() && to.name !== 'login') {
-      return { name: 'login' }
-    }
-  }
-  if (to.meta.onlyAnonymous === true) {
-    if (usersStore.isLoggedIn()) {
-      return { name: 'home' }
-    }
-  }
 })
 
 const app = createApp(App)

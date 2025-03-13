@@ -8,7 +8,7 @@ import DiagramName from './DiagramName.vue'
 const canvasStore = useCanvasStore()
 const usersStore = useUsersStore()
 
-const currentUser = computed(() => usersStore.currentUser())
+const currentUser = computed(() => usersStore.currentUser)
 const currentDiagram = computed(() => canvasStore.currentDiagram())
 </script>
 

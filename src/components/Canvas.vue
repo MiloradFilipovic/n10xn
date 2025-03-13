@@ -2,7 +2,7 @@
 import { useVueFlow, VueFlow, type Edge, type Node, Position } from '@vue-flow/core'
 import { Background } from '@vue-flow/background'
 
-import { computed, ref, watch } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import { useCanvasStore } from '@/stores/canvas.store'
 import { useUIStore } from '@/stores/ui.store'
 import { onKeyDown, onKeyUp } from '@vueuse/core'
@@ -12,6 +12,8 @@ import RegularNode from './nodes/RegularNode.vue'
 import { useDevice } from '@/composables/useDevice'
 import { NODE_TYPES } from '../../db/nodeTypes'
 import { useNodeTypesStore } from '@/stores/nodeTypes.store'
+import { useUsersStore } from '@/stores/users.store'
+import { useRouter } from 'vue-router'
 
 type Props = {
   diagramId: string
@@ -22,6 +24,8 @@ const props = defineProps<Props>()
 const canvasStore = useCanvasStore()
 const uiStore = useUIStore()
 const nodeTypesStore = useNodeTypesStore()
+const usersStore = useUsersStore()
+
 const {
   getSelectedNodes,
   onNodeDragStop,
@@ -32,6 +36,7 @@ const {
   onEdgeContextMenu,
 } = useVueFlow()
 const device = useDevice()
+const router = useRouter()
 
 const panningKeyCode = ref<string[]>([' ', device.controlKeyCode.value])
 const panningMouseButton = ref<number[]>([1])
@@ -119,7 +124,7 @@ onEdgesChange((updates) => {
 onEdgeContextMenu((event) => {
   console.log(event)
 
-  // TODO: Make this prettier
+  // TODO: Make this prettier and address ts error
   const httpRequestNodeType = nodeTypesStore.allNodeTypes[NODE_TYPES[2].id]
   // @ts-expect-error
   canvasStore.addNodeOnEdge(httpRequestNodeType, event.edge, event.event.clientX)
@@ -136,6 +141,12 @@ watch([getSelectedNodes, getSelectedEdges], ([nextNodes, nextEdges]) => {
   const selectedEdgeIds = nextEdges.map((edge) => edge.id)
   canvasStore.selectedNodes = selectedNodeIds
   canvasStore.selectedConnections = selectedEdgeIds
+})
+
+onMounted(() => {
+  if (!usersStore.isLoggedIn) {
+    router.push({ name: 'login' })
+  }
 })
 </script>
 

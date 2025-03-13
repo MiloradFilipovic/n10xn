@@ -10,15 +10,11 @@ import type { NodeType } from '../types/common'
 import { useUIStore } from '../stores/ui.store'
 
 const canvasStore = useCanvasStore()
-const usersStore = useUsersStore()
-const nodeTypesStore = useNodeTypesStore()
 const uiStore = useUIStore()
 
 const currentDiagramId = ref<string | null>(null)
 
 onMounted(() => {
-  nodeTypesStore.init()
-  usersStore.init()
   canvasStore.init()
   canvasStore.createNewDiagram('Untitled', '1')
   currentDiagramId.value = canvasStore.currentDiagramId

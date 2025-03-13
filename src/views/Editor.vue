@@ -19,7 +19,6 @@ const currentDiagramId = ref<string | null>(null)
 onMounted(() => {
   nodeTypesStore.init()
   usersStore.init()
-  usersStore.currentUserId = '1'
   canvasStore.init()
   canvasStore.createNewDiagram('Untitled', '1')
   currentDiagramId.value = canvasStore.currentDiagramId

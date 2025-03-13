@@ -2,12 +2,21 @@
 import { useNodeTypesStore } from '@/stores/nodeTypes.store'
 import NodeTypeItem from '@/components/nodeSidebar/NodeListItem.vue'
 import type { NodeType } from '@/types/common'
+import { useUsersStore } from '@/stores/users.store'
+import { useRouter } from 'vue-router'
 
 const nodeTypesStore = useNodeTypesStore()
+const usersStore = useUsersStore()
+const router = useRouter()
 
 const emit = defineEmits({
   'node-type-selected': (nodeType: NodeType) => true,
 })
+
+const onLogoutClick = () => {
+  usersStore.logout()
+  router.push('/')
+}
 </script>
 
 <template>
@@ -20,6 +29,14 @@ const emit = defineEmits({
         @click="emit('node-type-selected', nodeType)"
       />
     </ul>
+    <div :class="$style['footer']">
+      <div :class="$style['footer-item']">
+        <router-link to="/home"><font-awesome-icon icon="home" size="l" fixed-width /></router-link>
+      </div>
+      <div :class="$style['footer-item']" @click="onLogoutClick">
+        <font-awesome-icon icon="arrow-right-from-bracket" size="l" fixed-width />
+      </div>
+    </div>
   </div>
 </template>
 
@@ -41,5 +58,25 @@ const emit = defineEmits({
   display: flex;
   flex-direction: column;
   gap: 0.5em;
+}
+
+.footer {
+  display: flex;
+  padding-top: 2em;
+}
+
+.footer-item {
+  cursor: pointer;
+  padding: 0.5em;
+  border-radius: 4px;
+  transition: background-color 0.2s;
+
+  a {
+    color: inherit;
+  }
+
+  &:hover {
+    background-color: $color_light;
+  }
 }
 </style>

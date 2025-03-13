@@ -121,6 +121,7 @@ onEdgeContextMenu((event) => {
 
   // TODO: Make this prettier
   const httpRequestNodeType = nodeTypesStore.allNodeTypes[NODE_TYPES[2].id]
+  // @ts-expect-error
   canvasStore.addNodeOnEdge(httpRequestNodeType, event.edge, event.event.clientX)
 })
 

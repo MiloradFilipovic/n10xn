@@ -3,7 +3,6 @@ import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import { DIAGRAMS } from '../../db/diagrams'
 import type { NodeType } from '@/types/common'
-import { useUsersStore } from './users.store'
 import type { Edge } from '@vue-flow/core'
 
 export const useCanvasStore = defineStore('CANVAS_STORE', () => {

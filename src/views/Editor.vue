@@ -4,8 +4,6 @@ import Canvas from '@/components/Canvas.vue'
 import Toolbar from '@/components/toolbar/Toolbar.vue'
 import NodeSidebar from '@/components/nodeSidebar/NodeSidebar.vue'
 import { useCanvasStore } from '@/stores/canvas.store'
-import { useUsersStore } from '@/stores/users.store'
-import { useNodeTypesStore } from '@/stores/nodeTypes.store'
 import type { NodeType } from '../types/common'
 import { useUIStore } from '../stores/ui.store'
 
@@ -15,7 +13,6 @@ const uiStore = useUIStore()
 const currentDiagramId = ref<string | null>(null)
 
 onMounted(() => {
-  canvasStore.init()
   canvasStore.createNewDiagram('Untitled', '1')
   currentDiagramId.value = canvasStore.currentDiagramId
 })

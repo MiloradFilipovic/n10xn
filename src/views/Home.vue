@@ -1,11 +1,13 @@
 <script setup lang="ts">
 import Logo from '@/components/toolbar/Logo.vue'
+import { useCanvasStore } from '@/stores/canvas.store'
 import { useUsersStore } from '@/stores/users.store'
 import { Background } from '@vue-flow/background'
 import { onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 
 const usersStore = useUsersStore()
+const canvasStore = useCanvasStore()
 const router = useRouter()
 
 onMounted(() => {
@@ -30,6 +32,16 @@ onMounted(() => {
     </div>
     <div :class="$style.list">
       <div :class="$style.empty">No diagrams</div>
+      <!-- <div v-if="Object.keys(canvasStore.allDiagrams).length === 0" :class="$style.empty">
+        No diagrams
+      </div> -->
+      <!-- <div v-else>
+        <div v-for="diagram in Object.values(canvasStore.allDiagrams)" :key="diagram.id">
+          <router-link :to="{ name: 'canvas', params: { id: diagram.id } }">
+            {{ diagram.name }}
+          </router-link>
+        </div>
+      </div> -->
     </div>
     <div :class="$style.background">
       <Background />

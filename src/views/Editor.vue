@@ -6,6 +6,9 @@ import NodeSidebar from '@/components/nodeSidebar/NodeSidebar.vue'
 import { useCanvasStore } from '@/stores/canvas.store'
 import type { NodeType } from '../types/common'
 import { useUIStore } from '../stores/ui.store'
+import { useRoute } from 'vue-router'
+
+const route = useRoute()
 
 const canvasStore = useCanvasStore()
 const uiStore = useUIStore()
@@ -13,6 +16,14 @@ const uiStore = useUIStore()
 const currentDiagramId = ref<string | null>(null)
 
 onMounted(() => {
+  const id = route.params.id as string
+
+  const existingDiagram = canvasStore.allDiagrams[id]
+  if (existingDiagram) {
+    currentDiagramId.value = id
+    canvasStore.currentDiagramId = id
+    return
+  }
   canvasStore.createNewDiagram('Untitled', '1')
   currentDiagramId.value = canvasStore.currentDiagramId
 })

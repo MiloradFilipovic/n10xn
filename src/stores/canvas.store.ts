@@ -54,6 +54,7 @@ export const useCanvasStore = defineStore('CANVAS_STORE', () => {
     const newNode: Node = {
       id: new Date().getTime().toString(),
       type: nodeType.type,
+      nodeType: nodeType.id,
       position: position || { x: 10, y: 10 },
       data: {
         ...nodeType.parameters,
@@ -156,6 +157,7 @@ export const useCanvasStore = defineStore('CANVAS_STORE', () => {
     const newNode: Node = {
       id: new Date().getTime().toString(),
       type: nodeType.type,
+      nodeType: nodeType.id,
       position: {
         x: xPosition - distance,
         y: (sourceNode.position.y + targetNode.position.y) / 2,

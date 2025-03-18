@@ -14,34 +14,16 @@ const nodeType = computed(() => {
 </script>
 
 <template>
-  <div v-if="nodeType" :class="$style['node']">
-    <div :class="$style['node-name']">{{ props.data.data.name }}</div>
-    <div :class="$style['node-icon']">
-      <font-awesome-icon :icon="nodeType.icon" size="3x" fixed-width />
+  <div v-if="nodeType" class="node">
+    <div class="node-content">
+      <div class="node-header">
+        <div class="node-icon">
+          <font-awesome-icon :icon="nodeType.icon" size="lg" fixed-width />
+        </div>
+        <div class="node-name">{{ props.data.data.name }}</div>
+      </div>
     </div>
     <Handle id="source" type="source" :position="Position.Right" />
     <Handle id="target" type="target" :position="Position.Left" />
   </div>
 </template>
-
-<style module lang="scss">
-.node {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-}
-
-.node-icon {
-  color: $color_medium;
-}
-
-.node-name {
-  position: absolute;
-  top: 110%;
-  display: block;
-  width: 100%;
-  text-align: center;
-  color: $color_medium;
-}
-</style>

@@ -6,9 +6,13 @@ export const NODE_TYPES: NodeType[] = [
     type: 'trigger',
     name: 'Manual trigger',
     description: 'Manually trigger the workflow',
-    parameters: {
-      notice: 'This node does not have any parameters',
-    },
+    parameters: [
+      {
+        type: 'notice',
+        name: 'manualTriggerNotice',
+        content: 'This node has no parameters',
+      },
+    ],
     icon: ['fas', 'arrow-pointer'],
   },
   {
@@ -16,9 +20,17 @@ export const NODE_TYPES: NodeType[] = [
     type: 'trigger',
     name: 'Cron trigger',
     description: 'Trigger the workflow on a schedule',
-    parameters: {
-      cron: 'Cron expression',
-    },
+    parameters: [
+      {
+        type: 'string',
+        name: 'cronExpression',
+        label: 'Cron expression',
+        required: true,
+        default: '0 0 * * *',
+        maxLength: 100,
+        description: 'A cron expression to define the schedule',
+      },
+    ],
     icon: ['fas', 'clock'],
   },
   {
@@ -26,12 +38,45 @@ export const NODE_TYPES: NodeType[] = [
     type: 'regular',
     name: 'HTTP request',
     description: 'Make an HTTP request',
-    parameters: {
-      url: 'URL of the request',
-      method: 'HTTP method',
-      headers: 'Request headers',
-      body: 'Request body',
-    },
+    parameters: [
+      {
+        type: 'string',
+        name: 'url',
+        label: 'URL',
+        maxLength: 1000,
+        required: true,
+        description: 'URL of the request',
+      },
+      {
+        type: 'enum',
+        name: 'method',
+        label: 'HTTP method',
+        values: [
+          { value: 'GET', label: 'GET', default: true },
+          { value: 'POST', label: 'POST' },
+          { value: 'PUT', label: 'PUT' },
+          { value: 'DELETE', label: 'DELETE' },
+        ],
+        required: true,
+        description: 'HTTP method',
+      },
+      {
+        type: 'string',
+        name: 'headers',
+        label: 'Headers',
+        default: '{}',
+        maxLength: 1000,
+        description: 'Request headers',
+      },
+      {
+        type: 'string',
+        name: 'body',
+        label: 'Body',
+        default: '{}',
+        maxLength: 1000,
+        description: 'Request body',
+      },
+    ],
     icon: ['fas', 'globe'],
   },
   {
@@ -39,9 +84,17 @@ export const NODE_TYPES: NodeType[] = [
     type: 'if',
     name: 'If',
     description: 'Introduce a conditional branch',
-    parameters: {
-      condition: 'Condition to check',
-    },
+    parameters: [
+      {
+        type: 'string',
+        name: 'condition',
+        label: 'Condition',
+        maxLength: 100,
+        required: true,
+        default: '1 === 1',
+        description: 'Condition to check',
+      },
+    ],
     icon: ['fas', 'signs-post'],
   },
 ]

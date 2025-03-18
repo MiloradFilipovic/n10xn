@@ -15,9 +15,11 @@ export const DIAGRAMS: Diagram[] = [
         nodeType: 'manual-trigger',
         position: { x: 641, y: 155 },
         data: {
-          notice: 'This node does not have any parameters',
           name: 'Manual trigger',
           type: 'manual-trigger',
+          parameters: {
+            manualTriggerNotice: 'This node has no parameters',
+          },
         },
       },
       {
@@ -26,12 +28,15 @@ export const DIAGRAMS: Diagram[] = [
         nodeType: 'http-request',
         position: { x: 891, y: 155 },
         data: {
-          url: 'URL of the request',
-          method: 'HTTP method',
-          headers: 'Request headers',
-          body: 'Request body',
           name: 'HTTP request',
           type: 'http-request',
+          parameters: {
+            url: 'https://api.example.com',
+            method: 'GET',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+          },
         },
       },
     ],
@@ -58,7 +63,13 @@ export const DIAGRAMS: Diagram[] = [
         type: 'trigger',
         nodeType: 'cron-trigger',
         position: { x: 409, y: 266 },
-        data: { cron: 'Cron expression', name: 'Cron trigger', type: 'cron-trigger' },
+        data: {
+          name: 'Cron trigger',
+          type: 'cron-trigger',
+          parameters: {
+            cronExpression: '0 0 * * *',
+          },
+        },
       },
       {
         id: '1741985419873',
@@ -68,7 +79,13 @@ export const DIAGRAMS: Diagram[] = [
           x: 631,
           y: 265,
         },
-        data: { condition: 'Condition to check', name: 'If', type: 'if' },
+        data: {
+          name: 'If',
+          type: 'if',
+          parameters: {
+            condition: '20 > 10',
+          },
+        },
       },
       {
         id: '1741985427328',
@@ -76,12 +93,15 @@ export const DIAGRAMS: Diagram[] = [
         nodeType: 'http-request',
         position: { x: 942, y: 138 },
         data: {
-          url: 'URL of the request',
-          method: 'HTTP method',
-          headers: 'Request headers',
-          body: 'Request body',
           name: 'HTTP request',
           type: 'http-request',
+          parameters: {
+            url: 'https://api.example.com',
+            method: 'GET',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+          },
         },
       },
       {
@@ -90,12 +110,15 @@ export const DIAGRAMS: Diagram[] = [
         nodeType: 'http-request',
         position: { x: 961, y: 355 },
         data: {
-          url: 'URL of the request',
-          method: 'HTTP method',
-          headers: 'Request headers',
-          body: 'Request body',
           name: 'HTTP request 1',
           type: 'http-request',
+          parameters: {
+            url: 'https://api.example.com',
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+          },
         },
       },
     ],
@@ -105,7 +128,7 @@ export const DIAGRAMS: Diagram[] = [
         sourceId: '1741985417430',
         sourceHandle: 'source',
         targetId: '1741985419873',
-        targetHandle: '__vue_devtool_undefined__',
+        targetHandle: 'target',
       },
       {
         id: '1741985419873_1741985427328',

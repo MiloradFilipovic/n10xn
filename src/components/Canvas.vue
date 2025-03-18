@@ -51,8 +51,8 @@ const canvasNodes = computed((): Node[] => {
       id: node.id,
       type: node.type,
       position: node.position,
-      height: 100,
-      width: 100,
+      height: 200,
+      width: 200,
       label: node.data.name,
       data: node.data,
       targetPosition: Position.Left,
@@ -115,6 +115,8 @@ onNodesChange((updates) => {
 
 onEdgesChange((updates) => {
   updates.forEach((update) => {
+    console.log(update)
+
     if (update.type === 'remove') {
       canvasStore.removeConnection(update.id)
     }

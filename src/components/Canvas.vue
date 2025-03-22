@@ -115,8 +115,6 @@ onNodesChange((updates) => {
 
 onEdgesChange((updates) => {
   updates.forEach((update) => {
-    console.log(update)
-
     if (update.type === 'remove') {
       canvasStore.removeConnection(update.id)
     }
@@ -124,8 +122,6 @@ onEdgesChange((updates) => {
 })
 
 onEdgeContextMenu((event) => {
-  console.log(event)
-
   // TODO: Make this prettier and address ts error
   const httpRequestNodeType = nodeTypesStore.allNodeTypes[NODE_TYPES[2].id]
   // @ts-expect-error

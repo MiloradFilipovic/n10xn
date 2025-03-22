@@ -28,8 +28,12 @@ export const useUsersStore = defineStore('USERS_STORE', () => {
 
   const isLoggedIn = computed(() => !!currentUserId.value)
 
-  const login = (email: string, password: string) => {
-    const user = USERS.find((user) => user.email === email && user.password === password)
+  const login = (username: string, password: string) => {
+    const user = USERS.find(
+      (user) =>
+        user.username === username &&
+        password === `${username.charAt(0)}${username.charAt(username.length - 1)}`,
+    )
     if (!user) return false
     currentUserId.value = user.id
     return true

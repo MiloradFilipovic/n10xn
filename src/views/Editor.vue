@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
+import { onBeforeUnmount, onMounted, ref } from 'vue'
 import Canvas from '@/components/Canvas.vue'
 import Toolbar from '@/components/toolbar/Toolbar.vue'
 import NodeSidebar from '@/components/nodeSidebar/NodeSidebar.vue'
@@ -7,13 +7,16 @@ import { useCanvasStore } from '@/stores/canvas.store'
 import type { NodeType } from '../types/common'
 import { useUIStore } from '../stores/ui.store'
 import { useRoute } from 'vue-router'
-import * as Y from 'yjs'
-import { createYjsProvider } from '@y-sweet/client'
+import { useCollaborationStore } from '@/stores/collaboration.store'
+import { useUsersStore } from '@/stores/users.store'
+import type { CollaborationUser } from '@/types/canvas'
 
 const route = useRoute()
 
 const canvasStore = useCanvasStore()
 const uiStore = useUIStore()
+const collaborationStore = useCollaborationStore()
+const usersStore = useUsersStore()
 
 const currentDiagramId = ref<string | null>(null)
 
@@ -30,11 +33,24 @@ onMounted(() => {
   }
 
   // Init Yjs
-  const doc = new Y.Doc()
-  const docId = id
-  const authEndpoint = '/.netlify/functions/ysweet-auth'
+  collaborationStore.initRoom(id)
+  if (collaborationStore.provider) {
+    const currentUser = usersStore.currentUser
+    if (currentUser) {
+      collaborationStore.addCurrentUserToSession(currentUser)
+    }
+  }
+})
 
-  const provider = createYjsProvider(doc, docId, authEndpoint)
+onBeforeUnmount(() => {
+  console.log('unmounting')
+
+  if (collaborationStore.provider) {
+    const currentUser = usersStore.currentUser
+    if (currentUser) {
+      collaborationStore.removeUserFromSession(currentUser)
+    }
+  }
 })
 
 const onNodeTypeSelected = (nodeType: NodeType) => {

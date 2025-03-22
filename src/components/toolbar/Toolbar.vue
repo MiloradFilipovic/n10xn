@@ -4,12 +4,19 @@ import { computed } from 'vue'
 import { useUsersStore } from '@/stores/users.store'
 import Logo from '@/components/toolbar/Logo.vue'
 import DiagramName from './DiagramName.vue'
+import { useCollaborationStore } from '@/stores/collaboration.store'
+import type { CollaborationUser } from '@/types/canvas'
 
 const canvasStore = useCanvasStore()
 const usersStore = useUsersStore()
+const collaborationStore = useCollaborationStore()
 
 const currentUser = computed(() => usersStore.currentUser)
 const currentDiagram = computed(() => canvasStore.currentDiagram())
+
+const otherUsers = computed<CollaborationUser[]>(() => {
+  return collaborationStore.usersInSession.filter((user) => user.id !== usersStore.currentUser?.id)
+})
 </script>
 
 <template>
@@ -29,6 +36,12 @@ const currentDiagram = computed(() => canvasStore.currentDiagram())
         {{ currentUser?.firstName.charAt(0) }}{{ currentUser?.lastName.charAt(0) }}
       </div>
       <div>{{ currentUser?.firstName }} {{ currentUser?.lastName }}</div>
+      <div
+        v-if="otherUsers.length > 0"
+        :title="otherUsers.map((user) => `${user.firstName} ${user.lastName}`).join('\n')"
+      >
+        +{{ otherUsers.length }}
+      </div>
     </div>
   </div>
 </template>

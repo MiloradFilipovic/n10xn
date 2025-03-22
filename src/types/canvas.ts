@@ -35,3 +35,8 @@ export type User = {
   firstName: string
   lastName: string
 }
+
+export type CollaborationUser = Omit<User, 'email'> & {
+  color?: string
+  status: 'online' | 'offline'
+}

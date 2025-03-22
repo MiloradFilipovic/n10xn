@@ -43,8 +43,6 @@ onMounted(() => {
 })
 
 onBeforeUnmount(() => {
-  console.log('unmounting')
-
   if (collaborationStore.provider) {
     const currentUser = usersStore.currentUser
     if (currentUser) {

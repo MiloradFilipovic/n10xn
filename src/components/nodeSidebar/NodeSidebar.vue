@@ -4,16 +4,25 @@ import NodeTypeItem from '@/components/nodeSidebar/NodeListItem.vue'
 import type { NodeType } from '@/types/common'
 import { useUsersStore } from '@/stores/users.store'
 import { useRouter } from 'vue-router'
+import { useCollaborationStore } from '@/stores/collaboration.store'
+
+const router = useRouter()
 
 const nodeTypesStore = useNodeTypesStore()
 const usersStore = useUsersStore()
-const router = useRouter()
+const collaborationStore = useCollaborationStore()
 
 const emit = defineEmits({
   'node-type-selected': (nodeType: NodeType) => true,
 })
 
 const onLogoutClick = () => {
+  if (collaborationStore.provider) {
+    const currentUser = usersStore.currentUser
+    if (currentUser) {
+      collaborationStore.removeUserFromSession(currentUser)
+    }
+  }
   usersStore.logout()
   router.push('/')
 }

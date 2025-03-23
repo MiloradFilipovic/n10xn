@@ -14,6 +14,7 @@ import { NODE_TYPES } from '../../db/nodeTypes'
 import { useNodeTypesStore } from '@/stores/nodeTypes.store'
 import { useUsersStore } from '@/stores/users.store'
 import { useRouter } from 'vue-router'
+import { useCollaborationStore } from '@/stores/collaboration.store'
 
 type Props = {
   diagramId: string
@@ -25,6 +26,7 @@ const canvasStore = useCanvasStore()
 const uiStore = useUIStore()
 const nodeTypesStore = useNodeTypesStore()
 const usersStore = useUsersStore()
+const collaborationStore = useCollaborationStore()
 
 const {
   getSelectedNodes,
@@ -43,6 +45,20 @@ const panningMouseButton = ref<number[]>([1])
 const selectionKeyCode = ref<string | true | null>(true)
 
 const diagram = computed(() => canvasStore.allDiagrams[props.diagramId])
+
+const userCursors = computed(() => {
+  const currentUser = usersStore.currentUser
+  return collaborationStore.usersInSession
+    .filter((user) => user.id !== currentUser?.id)
+    .map((user) => {
+      return {
+        id: user.id,
+        username: user.username,
+        position: user.cursorPosition,
+        color: user.color,
+      }
+    })
+})
 
 const canvasNodes = computed((): Node[] => {
   if (!diagram.value) return []
@@ -150,6 +166,19 @@ onMounted(() => {
 
 <template>
   <div :class="$style['canvas-container']">
+    <div
+      v-for="cursor in userCursors"
+      :key="cursor.id"
+      :class="$style['user-cursor']"
+      :style="{
+        top: (cursor.position?.y ?? 0) + 'px',
+        left: (cursor.position?.x ?? 0) + 'px',
+        color: cursor.color,
+      }"
+    >
+      <font-awesome-icon icon="mouse-pointer" :class="$style['cursor-icon']" />
+      <span :class="$style['cursor-user']">{{ cursor.username }}</span>
+    </div>
     <VueFlow
       v-model:nodes="canvasNodes"
       :edges="canvasEdges"
@@ -184,5 +213,15 @@ onMounted(() => {
   width: 100%;
   height: 100%;
   overflow: hidden;
+}
+
+.user-cursor {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  gap: 0.5em;
+  font-size: 12px;
+  pointer-events: none;
+  z-index: 100;
 }
 </style>

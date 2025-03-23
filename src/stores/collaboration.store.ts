@@ -8,6 +8,7 @@ export const Y_SWEET_AUTH_ENDPOINT = '/.netlify/functions/ysweet-auth'
 
 export const useCollaborationStore = defineStore('COLLABORATION_STORE', () => {
   const usersInSession = ref<CollaborationUser[]>([])
+  const cursorPosition = ref<{ x: number; y: number } | null>(null)
 
   const document = ref<Y.Doc | null>(null)
   const provider = ref<YSweetProvider | null>(null)
@@ -25,7 +26,10 @@ export const useCollaborationStore = defineStore('COLLABORATION_STORE', () => {
         const user = value.user as CollaborationUser
         if (user) {
           if (user.status === 'online') {
-            if (!usersInSession.value.some((u) => u.id === user.id)) {
+            const existingUserIndex = usersInSession.value.findIndex((u) => u.id === user.id)
+            if (existingUserIndex !== -1) {
+              usersInSession.value[existingUserIndex] = user
+            } else {
               usersInSession.value.push(user)
             }
           } else if (user.status === 'offline') {
@@ -45,6 +49,15 @@ export const useCollaborationStore = defineStore('COLLABORATION_STORE', () => {
     })
   }
 
+  const setCursorPosition = (user: User, position: { x: number; y: number }) => {
+    cursorPosition.value = position
+    provider.value?.awareness.setLocalStateField('user', {
+      ...user,
+      status: 'online',
+      cursorPosition: position,
+    })
+  }
+
   const removeUserFromSession = (user: User) => {
     provider.value?.awareness.setLocalStateField('user', {
       ...user,
@@ -60,5 +73,6 @@ export const useCollaborationStore = defineStore('COLLABORATION_STORE', () => {
     initRoom,
     addUserToSession,
     removeUserFromSession,
+    setCursorPosition,
   }
 })

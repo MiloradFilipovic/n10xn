@@ -60,10 +60,17 @@ const leaveSession = () => {
 const onNodeTypeSelected = (nodeType: NodeType) => {
   canvasStore.addNode(nodeType, uiStore.lastClickedPosition)
 }
+
+const setCursorPos = (e: MouseEvent) => {
+  const currentUser = usersStore.currentUser
+  if (currentUser) {
+    collaborationStore.setCursorPosition(currentUser, { x: e.clientX, y: e.clientY })
+  }
+}
 </script>
 
 <template>
-  <div v-if="currentDiagramId" :class="$style.editor">
+  <div v-if="currentDiagramId" :class="$style.editor" @mousemove="setCursorPos">
     <Toolbar />
     <Canvas :diagram-id="currentDiagramId" />
     <NodeSidebar @node-type-selected="onNodeTypeSelected" />

@@ -9,7 +9,6 @@ import { useUIStore } from '../stores/ui.store'
 import { useRoute } from 'vue-router'
 import { useCollaborationStore } from '@/stores/collaboration.store'
 import { useUsersStore } from '@/stores/users.store'
-import type { CollaborationUser } from '@/types/canvas'
 
 const route = useRoute()
 
@@ -37,19 +36,26 @@ onMounted(() => {
   if (collaborationStore.provider) {
     const currentUser = usersStore.currentUser
     if (currentUser) {
-      collaborationStore.addCurrentUserToSession(currentUser)
+      collaborationStore.addUserToSession(currentUser)
     }
   }
+
+  window.addEventListener('beforeunload', leaveSession)
 })
 
 onBeforeUnmount(() => {
+  leaveSession()
+  window.removeEventListener('beforeunload', leaveSession)
+})
+
+const leaveSession = () => {
   if (collaborationStore.provider) {
     const currentUser = usersStore.currentUser
     if (currentUser) {
       collaborationStore.removeUserFromSession(currentUser)
     }
   }
-})
+}
 
 const onNodeTypeSelected = (nodeType: NodeType) => {
   canvasStore.addNode(nodeType, uiStore.lastClickedPosition)

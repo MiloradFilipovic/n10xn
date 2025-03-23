@@ -24,8 +24,10 @@ export const useCollaborationStore = defineStore('COLLABORATION_STORE', () => {
       for (const value of values) {
         const user = value.user as CollaborationUser
         if (user) {
-          if (user.status === 'online' && !usersInSession.value.some((u) => u.id === user.id)) {
-            usersInSession.value.push(user)
+          if (user.status === 'online') {
+            if (!usersInSession.value.some((u) => u.id === user.id)) {
+              usersInSession.value.push(user)
+            }
           } else if (user.status === 'offline') {
             usersInSession.value = usersInSession.value.filter((u) => u.id !== user.id)
           }
@@ -34,7 +36,7 @@ export const useCollaborationStore = defineStore('COLLABORATION_STORE', () => {
     })
   }
 
-  const addCurrentUserToSession = (user: User) => {
+  const addUserToSession = (user: User) => {
     const randomColor = Math.floor(Math.random() * 16777215).toString(16)
     provider.value?.awareness.setLocalStateField('user', {
       ...user,
@@ -56,7 +58,7 @@ export const useCollaborationStore = defineStore('COLLABORATION_STORE', () => {
     document,
     provider,
     initRoom,
-    addCurrentUserToSession,
+    addUserToSession,
     removeUserFromSession,
   }
 })

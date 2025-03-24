@@ -28,18 +28,15 @@ const getContrastColor = (backgroundColor: string) => {
     <div
       v-if="currentUser"
       :class="[$style.avatar, $style.currentUser]"
-      :style="{
-        backgroundColor: `#${currentUser.color}`,
-        color: getContrastColor(`#${currentUser.color}`),
-      }"
+      :style="{ zIndex: otherUsers.length + 1 }"
       :title="`${currentUser.firstName} ${currentUser.lastName}`"
     >
       {{ currentUser.firstName.charAt(0) }}{{ currentUser.lastName.charAt(0) }}
     </div>
-    <div v-for="user in otherUsers" :key="user.id" :title="`${user.firstName} ${user.lastName}`">
+    <div v-for="user, index in otherUsers" :key="user.id" :title="`${user.firstName} ${user.lastName}`">
       <div
         :class="[$style.avatar, $style.otherUser]"
-        :style="{ backgroundColor: `#${user.color}`, color: getContrastColor(`#${user.color}`) }"
+        :style="{ backgroundColor: `#${user.color}`, color: getContrastColor(`#${user.color}`), zIndex: otherUsers.length - index }"
       >
         {{ user.firstName.charAt(0) }}{{ user.lastName.charAt(0) }}
       </div>
@@ -58,20 +55,22 @@ const getContrastColor = (backgroundColor: string) => {
   cursor: pointer;
   font-size: 0.6em;
   border-radius: 50%;
-  background-color: #ccc;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
 .currentUser {
-  border: 1px solid $color_primary;
+  background-color: $color-dark;
+  color: $color-light;
+  font-weight: bold;
   z-index: 1;
 }
 
 .otherUser {
+  position: relative;
   margin-left: -5px;
-  opacity: 0.5;
+  opacity: 0.7;
 
   &:hover {
     opacity: 1;

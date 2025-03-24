@@ -59,6 +59,7 @@ const onNodeTypeSelected = (nodeType: NodeType) => {
 }
 
 const setCursorPos = (e: MouseEvent) => {
+  // TODO: Think about throttling this
   collaborationStore.setCursorPosition({ x: e.clientX, y: e.clientY })
 }
 </script>

@@ -17,6 +17,10 @@ export const useCollaborationStore = defineStore('COLLABORATION_STORE', () => {
   const document = ref<Y.Doc | null>(null)
   const provider = ref<YSweetProvider | null>(null)
 
+  const currentUser = computed(() => {
+    return usersInSession.value[clientId.value || 0]
+  })
+
   const otherUsers = computed(() => {
     return Object.values(usersInSession.value).filter((user) => user.clientId !== clientId.value)
   })
@@ -95,6 +99,7 @@ export const useCollaborationStore = defineStore('COLLABORATION_STORE', () => {
     joinSession,
     leaveSession,
     setCursorPosition,
+    currentUser,
     otherUsers,
   }
 })

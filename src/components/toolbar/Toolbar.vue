@@ -6,6 +6,7 @@ import Logo from '@/components/toolbar/Logo.vue'
 import DiagramName from './DiagramName.vue'
 import { useCollaborationStore } from '@/stores/collaboration.store'
 import type { CollaborationUser } from '@/types/canvas'
+import UserStack from './UserStack.vue'
 
 const canvasStore = useCanvasStore()
 const usersStore = useUsersStore()
@@ -31,18 +32,7 @@ const otherUsers = computed<CollaborationUser[]>(() => {
         />
       </div>
     </div>
-    <div :class="$style.user">
-      <div :class="$style.avatar">
-        {{ currentUser?.firstName.charAt(0) }}{{ currentUser?.lastName.charAt(0) }}
-      </div>
-      <div>{{ currentUser?.firstName }} {{ currentUser?.lastName }}</div>
-      <div
-        v-if="otherUsers.length > 0"
-        :title="otherUsers.map((user) => `${user.firstName} ${user.lastName}`).join('\n')"
-      >
-        +{{ otherUsers.length }}
-      </div>
-    </div>
+    <UserStack />
   </div>
 </template>
 
@@ -68,24 +58,5 @@ const otherUsers = computed<CollaborationUser[]>(() => {
   display: flex;
   gap: 0.5em;
   align-items: center;
-}
-
-.user {
-  display: flex;
-  gap: 0.3em;
-  align-items: center;
-  color: $color_primary;
-}
-
-.avatar {
-  width: 30px;
-  height: 30px;
-  color: $color_dark;
-  font-size: 0.8em;
-  border-radius: 50%;
-  background-color: #ccc;
-  display: flex;
-  align-items: center;
-  justify-content: center;
 }
 </style>

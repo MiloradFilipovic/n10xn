@@ -47,17 +47,14 @@ const selectionKeyCode = ref<string | true | null>(true)
 const diagram = computed(() => canvasStore.allDiagrams[props.diagramId])
 
 const userCursors = computed(() => {
-  const currentUser = usersStore.currentUser
-  return collaborationStore.usersInSession
-    .filter((user) => user.id !== currentUser?.id)
-    .map((user) => {
-      return {
-        id: user.id,
-        username: user.username,
-        position: user.cursorPosition,
-        color: user.color,
-      }
-    })
+  return collaborationStore.otherUsers.map((user) => {
+    return {
+      id: user.id,
+      username: user.username,
+      position: user.cursorPosition,
+      color: user.color,
+    }
+  })
 })
 
 const canvasNodes = computed((): Node[] => {
@@ -173,7 +170,7 @@ onMounted(() => {
       :style="{
         top: (cursor.position?.y ?? 0) + 'px',
         left: (cursor.position?.x ?? 0) + 'px',
-        color: cursor.color,
+        color: `#${cursor.color}`,
       }"
     >
       <font-awesome-icon icon="mouse-pointer" :class="$style['cursor-icon']" />

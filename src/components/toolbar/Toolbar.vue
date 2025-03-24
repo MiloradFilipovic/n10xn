@@ -15,7 +15,7 @@ const currentUser = computed(() => usersStore.currentUser)
 const currentDiagram = computed(() => canvasStore.currentDiagram())
 
 const otherUsers = computed<CollaborationUser[]>(() => {
-  return collaborationStore.usersInSession.filter((user) => user.id !== usersStore.currentUser?.id)
+  return collaborationStore.otherUsers
 })
 </script>
 

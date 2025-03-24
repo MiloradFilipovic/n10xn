@@ -34,10 +34,7 @@ onMounted(() => {
   // Init Yjs
   collaborationStore.initRoom(id)
   if (collaborationStore.provider) {
-    const currentUser = usersStore.currentUser
-    if (currentUser) {
-      collaborationStore.addUserToSession(currentUser)
-    }
+    collaborationStore.joinSession()
   }
 
   window.addEventListener('beforeunload', leaveSession)
@@ -52,7 +49,7 @@ const leaveSession = () => {
   if (collaborationStore.provider) {
     const currentUser = usersStore.currentUser
     if (currentUser) {
-      collaborationStore.removeUserFromSession(currentUser)
+      collaborationStore.leaveSession()
     }
   }
 }
@@ -62,10 +59,7 @@ const onNodeTypeSelected = (nodeType: NodeType) => {
 }
 
 const setCursorPos = (e: MouseEvent) => {
-  const currentUser = usersStore.currentUser
-  if (currentUser) {
-    collaborationStore.setCursorPosition(currentUser, { x: e.clientX, y: e.clientY })
-  }
+  collaborationStore.setCursorPosition({ x: e.clientX, y: e.clientY })
 }
 </script>
 

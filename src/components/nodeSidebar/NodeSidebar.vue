@@ -20,7 +20,7 @@ const onLogoutClick = () => {
   if (collaborationStore.provider) {
     const currentUser = usersStore.currentUser
     if (currentUser) {
-      collaborationStore.removeUserFromSession(currentUser)
+      collaborationStore.leaveSession()
     }
   }
   usersStore.logout()

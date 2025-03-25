@@ -16,6 +16,11 @@ onMounted(() => {
     router.push({ name: 'login' })
   }
 })
+
+const onLogoutClick = () => {
+  usersStore.logout()
+  router.push('/')
+}
 </script>
 
 <template>
@@ -29,6 +34,9 @@ onMounted(() => {
         <button @click="router.push({ name: 'canvas', params: { id: 'new' } })">
           Create New Diagram
         </button>
+        <div :class="$style['logout-button']" title="Sign out" @click="onLogoutClick">
+          <font-awesome-icon icon="arrow-right-from-bracket" size="xl" fixed-width />
+        </div>
       </div>
     </div>
     <div :class="$style.list">
@@ -66,13 +74,19 @@ onMounted(() => {
   justify-content: space-between;
   align-items: center;
   width: 70%;
-  padding: 1em;
+  padding: .5em;
   border-bottom: 1px solid $color_medium;
 }
 
 .main-content {
   display: flex;
   gap: 0.5em;
+  align-items: center;
+}
+
+.buttons {
+  display: flex;
+  gap: .5em;
   align-items: center;
 }
 
@@ -83,6 +97,14 @@ button {
   background-color: $color_primary;
   color: #fff;
   cursor: pointer;
+}
+
+.logout-button {
+  cursor: pointer;
+
+  &:hover {
+    color: $color_primary;
+  }
 }
 
 .list {

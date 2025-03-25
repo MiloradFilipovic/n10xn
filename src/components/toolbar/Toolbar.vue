@@ -21,7 +21,9 @@ const renameDiagram = (newName: string) => {
   <div :class="$style.toolbar">
     <div :class="$style.controls">
       <div :class="$style['main-content']">
-        <Logo size="small" />
+        <router-link to="/home">
+          <Logo size="small" />
+        </router-link>
         <DiagramName
           v-if="currentDiagram"
           :name="currentDiagram.name"
@@ -55,5 +57,9 @@ const renameDiagram = (newName: string) => {
   display: flex;
   gap: 0.5em;
   align-items: center;
+
+  a {
+    text-decoration: none;
+  }
 }
 </style>

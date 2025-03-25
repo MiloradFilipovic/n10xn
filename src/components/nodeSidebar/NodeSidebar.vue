@@ -17,12 +17,7 @@ const emit = defineEmits({
 })
 
 const onLogoutClick = () => {
-  if (collaborationStore.provider) {
-    const currentUser = usersStore.currentUser
-    if (currentUser) {
-      collaborationStore.leaveSession()
-    }
-  }
+  collaborationStore.destroySession()
   usersStore.logout()
   router.push('/')
 }

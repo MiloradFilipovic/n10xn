@@ -25,12 +25,26 @@ export const useCollaborationStore = defineStore('COLLABORATION_STORE', () => {
     return Object.values(usersInSession.value).filter((user) => user.clientId !== clientId.value)
   })
 
-  const initRoom = (roomId: string) => {
+  const initSession = (roomId: string) => {
     usersInSession.value = []
     document.value = new Y.Doc()
     provider.value = createYjsProvider(document.value, roomId, Y_SWEET_AUTH_ENDPOINT)
 
     provider.value.awareness.on('change', handleAwarenessChange)
+  }
+
+  const joinSession = () => {
+    const currentUser = usersStore.currentUser
+    if (currentUser) {
+      addUserToSession(currentUser)
+    }
+  }
+
+  const destroySession = () => {
+    leaveSession()
+    provider.value?.awareness.off('change', handleAwarenessChange)
+    provider.value?.destroy()
+    document.value?.destroy()
   }
 
   const handleAwarenessChange = () => {
@@ -49,13 +63,6 @@ export const useCollaborationStore = defineStore('COLLABORATION_STORE', () => {
       })
     }
     usersInSession.value = users
-  }
-
-  const joinSession = () => {
-    const currentUser = usersStore.currentUser
-    if (currentUser) {
-      addUserToSession(currentUser)
-    }
   }
 
   const addUserToSession = (user: User) => {
@@ -94,9 +101,10 @@ export const useCollaborationStore = defineStore('COLLABORATION_STORE', () => {
     usersInSession,
     document,
     provider,
-    initRoom,
+    initSession,
     addUserToSession,
     joinSession,
+    destroySession,
     leaveSession,
     setCursorPosition,
     currentUser,

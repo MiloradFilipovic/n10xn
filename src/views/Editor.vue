@@ -8,14 +8,12 @@ import type { NodeType } from '../types/common'
 import { useUIStore } from '../stores/ui.store'
 import { useRoute } from 'vue-router'
 import { useCollaborationStore } from '@/stores/collaboration.store'
-import { useUsersStore } from '@/stores/users.store'
 
 const route = useRoute()
 
 const canvasStore = useCanvasStore()
 const uiStore = useUIStore()
 const collaborationStore = useCollaborationStore()
-const usersStore = useUsersStore()
 
 const currentDiagramId = ref<string | null>(null)
 
@@ -32,10 +30,8 @@ onMounted(() => {
   }
 
   // Init Yjs
-  collaborationStore.initRoom(id)
-  if (collaborationStore.provider) {
-    collaborationStore.joinSession()
-  }
+  collaborationStore.initSession(id)
+  collaborationStore.joinSession()
 
   window.addEventListener('beforeunload', leaveSession)
 })
@@ -46,12 +42,7 @@ onBeforeUnmount(() => {
 })
 
 const leaveSession = () => {
-  if (collaborationStore.provider) {
-    const currentUser = usersStore.currentUser
-    if (currentUser) {
-      collaborationStore.leaveSession()
-    }
-  }
+  collaborationStore.destroySession()
 }
 
 const onNodeTypeSelected = (nodeType: NodeType) => {

@@ -41,4 +41,5 @@ export type CollaborationUser = Omit<User, 'email'> & {
   color?: string
   status: 'online' | 'offline'
   cursorPosition?: { x: number; y: number }
+  isEditingDiagramName?: boolean
 }

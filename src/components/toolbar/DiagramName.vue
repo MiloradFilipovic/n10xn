@@ -1,7 +1,8 @@
 <script setup lang="ts">
+import { useCollaborationStore } from '@/stores/collaboration.store'
 import type { Diagram } from '@/types/canvas'
 import { onClickOutside } from '@vueuse/core'
-import { nextTick, ref, useTemplateRef } from 'vue'
+import { computed, nextTick, ref, useTemplateRef } from 'vue'
 
 type Props = {
   name: string
@@ -13,13 +14,24 @@ const emit = defineEmits({
   'diagram-name-updated': (newName: string) => true,
 })
 
+const collaborationStore = useCollaborationStore()
+
 const editMode = ref(false)
 const nameInput = useTemplateRef<HTMLInputElement>('nameInput')
 
-onClickOutside(nameInput, (event) => (editMode.value = false))
+const otherUserCurrentlyEditingDiagramName = computed(() => {
+  return collaborationStore.otherUserCurrentlyEditingDiagramName;
+})
+
+onClickOutside(nameInput, (event) => (switchToLabelMode()))
 
 const switchToEditMode = () => {
+  if (otherUserCurrentlyEditingDiagramName.value !== undefined) {
+    return
+  }
+  
   editMode.value = true
+  collaborationStore.setEditingDiagramName(true)
   nextTick(() => {
     if (nameInput.value) {
       nameInput.value.focus()
@@ -30,6 +42,7 @@ const switchToEditMode = () => {
 
 const switchToLabelMode = () => {
   editMode.value = false
+  collaborationStore.setEditingDiagramName(false)
   if (nameInput.value && nameInput.value.value !== '') {
     emit('diagram-name-updated', nameInput.value.value)
   }
@@ -37,8 +50,8 @@ const switchToLabelMode = () => {
 </script>
 
 <template>
-  <div :class="$style.container">
-    <div v-if="!editMode" :class="$style.label" @click="switchToEditMode">
+  <div :class="$style.container" :title="otherUserCurrentlyEditingDiagramName ? `Currently being edited by ${otherUserCurrentlyEditingDiagramName.username}` : ''">
+    <div v-if="!editMode" :class="{[$style.label]: true, [$style.disabled]: otherUserCurrentlyEditingDiagramName !== undefined}" @click="switchToEditMode">
       {{ props.name }}
     </div>
     <input
@@ -47,6 +60,7 @@ const switchToLabelMode = () => {
       :class="$style['name-input']"
       :value="props.name"
       tabindex="0"
+      :disabled="otherUserCurrentlyEditingDiagramName !== undefined"
       @keydown.enter="switchToLabelMode"
     />
   </div>
@@ -59,6 +73,10 @@ const switchToLabelMode = () => {
 
 .label {
   cursor: pointer;
+
+  &.disabled {
+    cursor: not-allowed;
+  }
 }
 
 .name-input {

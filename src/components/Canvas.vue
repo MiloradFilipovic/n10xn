@@ -158,6 +158,7 @@ onMounted(() => {
   if (!usersStore.isLoggedIn) {
     router.push({ name: 'login' })
   }
+  useVueFlow().fitView()
 })
 </script>
 

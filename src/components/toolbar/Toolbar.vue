@@ -1,23 +1,20 @@
 <script setup lang="ts">
 import { useCanvasStore } from '../../stores/canvas.store'
 import { computed } from 'vue'
-import { useUsersStore } from '@/stores/users.store'
 import Logo from '@/components/toolbar/Logo.vue'
 import DiagramName from './DiagramName.vue'
-import { useCollaborationStore } from '@/stores/collaboration.store'
-import type { CollaborationUser } from '@/types/canvas'
 import UserStack from './UserStack.vue'
+import { useCollaborationStore } from '@/stores/collaboration.store'
 
 const canvasStore = useCanvasStore()
-const usersStore = useUsersStore()
 const collaborationStore = useCollaborationStore()
 
-const currentUser = computed(() => usersStore.currentUser)
 const currentDiagram = computed(() => canvasStore.currentDiagram())
 
-const otherUsers = computed<CollaborationUser[]>(() => {
-  return collaborationStore.otherUsers
-})
+const renameDiagram = (newName: string) => {
+  canvasStore.renameCurrentDiagram(newName)
+  collaborationStore.notifyDiagramNameChange(newName)
+}
 </script>
 
 <template>
@@ -28,7 +25,7 @@ const otherUsers = computed<CollaborationUser[]>(() => {
         <DiagramName
           v-if="currentDiagram"
           :name="currentDiagram.name"
-          @diagram-name-updated="canvasStore.renameCurrentDiagram"
+          @diagram-name-updated="renameDiagram"
         />
       </div>
     </div>

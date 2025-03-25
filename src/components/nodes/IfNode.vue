@@ -24,6 +24,7 @@ const nodeType = computed(() => {
         </div>
         <div class="node-name">{{ props.data.data.name }}</div>
       </div>
+      <div class="node-parameters nodrag"></div>
     </div>
     <Handle id="target" type="target" :position="Position.Left" />
     <Handle id="source-true" type="source" :position="Position.Right" style="top: 60px" />

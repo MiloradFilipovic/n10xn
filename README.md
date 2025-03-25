@@ -9,6 +9,12 @@ This is not actually a workflow automation tool, it's a demo project where I can
 ## Project Setup
 
 ```sh
+# Set your YSweet connection string environment variable
+Y_SWEET_CONNECTION_STRING=yss://<...>
+```
+
+```sh
+# Install dependencies
 npm install
 ```
 

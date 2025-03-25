@@ -64,6 +64,7 @@ export const useCanvasStore = defineStore('CANVAS_STORE', () => {
     }
 
     diagram.nodes.push(newNode)
+    setUpdatedAt(new Date().toISOString())
   }
 
   const getUniqueNodeName = (nodeType: NodeType) => {
@@ -89,6 +90,7 @@ export const useCanvasStore = defineStore('CANVAS_STORE', () => {
     if (index === -1) return
 
     diagram.nodes.splice(index, 1)
+    setUpdatedAt(new Date().toISOString())
   }
 
   const removeConnection = (connectionId: string) => {
@@ -99,6 +101,7 @@ export const useCanvasStore = defineStore('CANVAS_STORE', () => {
     if (index === -1) return
 
     diagram.connections.splice(index, 1)
+    setUpdatedAt(new Date().toISOString())
   }
 
   const moveNode = (nodeId: string, position: { x: number; y: number }) => {
@@ -109,6 +112,7 @@ export const useCanvasStore = defineStore('CANVAS_STORE', () => {
     if (!node) return
 
     node.position = position
+    setUpdatedAt(new Date().toISOString())
   }
 
   const removeSelectedNodes = () => {
@@ -118,6 +122,7 @@ export const useCanvasStore = defineStore('CANVAS_STORE', () => {
     selectedNodes.value.forEach((nodeId) => {
       removeNode(nodeId)
     })
+    setUpdatedAt(new Date().toISOString())
   }
 
   const removeSelectedConnections = () => {
@@ -127,6 +132,7 @@ export const useCanvasStore = defineStore('CANVAS_STORE', () => {
     selectedConnections.value.forEach((connectionId) => {
       removeConnection(connectionId)
     })
+    setUpdatedAt(new Date().toISOString())
   }
 
   const connectNodes = (
@@ -143,6 +149,7 @@ export const useCanvasStore = defineStore('CANVAS_STORE', () => {
       targetHandle: target.handle,
     }
     addConnection(connection)
+    setUpdatedAt(new Date().toISOString())
   }
 
   const addNodeOnEdge = (nodeType: NodeType, edge: Edge, xPosition: number) => {
@@ -171,6 +178,7 @@ export const useCanvasStore = defineStore('CANVAS_STORE', () => {
     diagram.nodes.push(newNode)
     connectNodes({ id: sourceNode.id }, { id: newNode.id })
     connectNodes({ id: newNode.id }, { id: targetNode.id })
+    setUpdatedAt(new Date().toISOString())
     // And we also want to push downstream nodes to the right by 100px
     diagram.nodes
       .filter((node) => node.position.x > newNode.position.x)
@@ -183,6 +191,13 @@ export const useCanvasStore = defineStore('CANVAS_STORE', () => {
     const diagram = currentDiagram()
     if (!diagram) return
     diagram.name = name
+    setUpdatedAt(new Date().toISOString())
+  }
+
+  const setUpdatedAt = (time: string) => {
+    const diagram = currentDiagram()
+    if (!diagram) return
+    diagram.updatedAt = time
   }
 
   return {
@@ -205,5 +220,6 @@ export const useCanvasStore = defineStore('CANVAS_STORE', () => {
     connectNodes,
     renameCurrentDiagram,
     addNodeOnEdge,
+    setUpdatedAt,
   }
 })

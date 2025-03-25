@@ -51,10 +51,19 @@ export const useCollaborationStore = defineStore('COLLABORATION_STORE', () => {
     // React to metadata changes
     yMetadata.observe(event => {
       event.changes.keys.forEach((change, key) => {
-        if (key === 'name' && change.action === 'update') {
-          const name = yMetadata.get('name') as string
-          if (name) {
-            canvasStore.renameCurrentDiagram(yMetadata.get('name') as string);
+        if (change.action === 'update') {
+          switch (key) {
+            case 'name':
+              const name = yMetadata.get('name') as string
+              if (name) {
+                canvasStore.renameCurrentDiagram(yMetadata.get('name') as string);
+              }
+              break
+            case 'updatedAt':
+              const updatedAt = yMetadata.get('updatedAt') as string
+              if (updatedAt) {
+                canvasStore.setUpdatedAt(yMetadata.get('updatedAt') as string);
+              }
           }
         }
       })
@@ -139,6 +148,7 @@ export const useCollaborationStore = defineStore('COLLABORATION_STORE', () => {
   const notifyDiagramNameChange = (name: string) => {
     const yMetadata = document.value?.getMap('metadata')
     yMetadata?.set('name', name)
+    yMetadata?.set('updatedAt', new Date().toISOString())
   }
 
   return {

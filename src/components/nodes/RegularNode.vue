@@ -16,14 +16,11 @@ const nodeType = computed(() => {
 <template>
   <div v-if="nodeType" class="node">
     <div class="node-content">
-      <div class="node-header">
         <div class="node-icon">
-          <font-awesome-icon :icon="nodeType.icon" size="lg" fixed-width />
+          <font-awesome-icon :icon="nodeType.icon" size="5x" fixed-width />
         </div>
-        <div class="node-name">{{ props.data.data.name }}</div>
-      </div>
-      <div class="node-parameters nodrag"></div>
     </div>
+    <div class="node-name">{{ props.data.data.name }}</div>
     <Handle id="source" type="source" :position="Position.Right" />
     <Handle id="target" type="target" :position="Position.Left" />
   </div>

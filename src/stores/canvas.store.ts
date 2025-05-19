@@ -4,12 +4,15 @@ import { ref } from 'vue'
 import { DIAGRAMS } from '../../db/diagrams'
 import type { NodeType } from '@/types/common'
 import type { Edge } from '@vue-flow/core'
+import { useCollaborationStore } from './collaboration.store'
 
 export const useCanvasStore = defineStore('CANVAS_STORE', () => {
   const allDiagrams = ref<Record<string, Diagram>>({})
   const currentDiagramId = ref<string | null>(null)
   const selectedNodes = ref<string[]>([])
   const selectedConnections = ref<string[]>([])
+
+  const collaborationStore = useCollaborationStore()
 
   const init = () => {
     loadDiagrams()
@@ -113,6 +116,7 @@ export const useCanvasStore = defineStore('CANVAS_STORE', () => {
 
     node.position = position
     setUpdatedAt(new Date().toISOString())
+    collaborationStore.notifyNodeMoved(nodeId, position)
   }
 
   const removeSelectedNodes = () => {

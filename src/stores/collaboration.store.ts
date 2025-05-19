@@ -1,4 +1,4 @@
-import type { CollaborationUser, User } from '@/types/canvas'
+import type { CollaborationUser, Node, User } from '@/types/canvas'
 import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
 import * as Y from 'yjs'
@@ -24,7 +24,7 @@ export const useCollaborationStore = defineStore('COLLABORATION_STORE', () => {
   })
 
   const currentDiagram = computed(() => {
-    return canvasStore.currentDiagram
+    return canvasStore.currentDiagram()
   })
 
   const otherUsers = computed(() => {
@@ -48,6 +48,35 @@ export const useCollaborationStore = defineStore('COLLABORATION_STORE', () => {
     if (!yMetadata.get('name')) {
       yMetadata.set('name', currentDiagram.value.name)
     }
+
+    const yNodes = document.value.getMap('nodes')
+    if (otherUsers.value.length === 0 && yNodes.size === 0) {
+      currentDiagram.value.nodes.forEach((node) => {
+        yNodes.set(node.id, node)
+      })
+    }
+
+    // React to node changes
+    yNodes.observe(event => {
+      // Only react to changes by other users
+      if (event.transaction.origin === provider.value?.awareness.clientID) return
+      event.changes.keys.forEach((change, key) => {
+        if (change.action === 'update') { 
+          const node = yNodes.get(key) as Node
+          if (node) {
+            // Find the node in the current diagram and replace it
+            // TODO: This can be more optimized by fine graining the updates
+            if (currentDiagram.value) {
+              const index = currentDiagram.value.nodes.findIndex((n) => n.id === key)
+              if (index !== undefined && index !== -1) {
+                currentDiagram.value.nodes[index] = node
+              }
+            }
+          }
+        }
+      })
+    })
+
     // React to metadata changes
     yMetadata.observe(event => {
       event.changes.keys.forEach((change, key) => {
@@ -151,6 +180,15 @@ export const useCollaborationStore = defineStore('COLLABORATION_STORE', () => {
     yMetadata?.set('updatedAt', new Date().toISOString())
   }
 
+  const notifyNodeMoved = (nodeId: string, position: { x: number; y: number }) => {
+    const yNodes = document.value?.getMap('nodes')
+    const node = yNodes?.get(nodeId) as Node
+    if (node) {
+      node.position = position
+      yNodes?.set(nodeId, node)
+    }
+  }
+
   return {
     usersInSession,
     document,
@@ -166,5 +204,6 @@ export const useCollaborationStore = defineStore('COLLABORATION_STORE', () => {
     otherUserCurrentlyEditingDiagramName,
     setEditingDiagramName,
     notifyDiagramNameChange,
+    notifyNodeMoved,
   }
 })

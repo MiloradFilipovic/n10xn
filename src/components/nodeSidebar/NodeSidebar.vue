@@ -2,15 +2,8 @@
 import { useNodeTypesStore } from '@/stores/nodeTypes.store'
 import NodeTypeItem from '@/components/nodeSidebar/NodeListItem.vue'
 import type { NodeType } from '@/types/common'
-import { useUsersStore } from '@/stores/users.store'
-import { useRouter } from 'vue-router'
-import { useCollaborationStore } from '@/stores/collaboration.store'
-
-const router = useRouter()
 
 const nodeTypesStore = useNodeTypesStore()
-const usersStore = useUsersStore()
-const collaborationStore = useCollaborationStore()
 
 const emit = defineEmits({
   'node-type-selected': (nodeType: NodeType) => true,

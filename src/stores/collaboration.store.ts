@@ -189,6 +189,19 @@ export const useCollaborationStore = defineStore('COLLABORATION_STORE', () => {
     }
   }
 
+  const notifyNodesMoved = (nodes: Array<{ id: string; position: { x: number; y: number } }>) => {
+    const yNodes = document.value?.getMap('nodes')
+    document.value?.transact(() => {
+      nodes.forEach(({ id, position }) => { 
+        const node = yNodes?.get(id) as Node
+        if (node) {
+          node.position = position
+          yNodes?.set(id, node)
+        }
+      }) 
+    })
+  }
+
   return {
     usersInSession,
     document,
@@ -205,5 +218,6 @@ export const useCollaborationStore = defineStore('COLLABORATION_STORE', () => {
     setEditingDiagramName,
     notifyDiagramNameChange,
     notifyNodeMoved,
+    notifyNodesMoved,
   }
 })

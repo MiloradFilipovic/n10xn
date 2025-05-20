@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useVueFlow, VueFlow, type Edge, type Node, Position } from '@vue-flow/core'
+import { useVueFlow, VueFlow, type Edge, type Node, Position, type NodeDragEvent } from '@vue-flow/core'
 import { Background } from '@vue-flow/background'
 
 import { computed, onMounted, ref, watch } from 'vue'
@@ -31,6 +31,7 @@ const collaborationStore = useCollaborationStore()
 const {
   getSelectedNodes,
   onNodeDragStop,
+  onSelectionDragStop,
   getSelectedEdges,
   onConnect,
   onNodesChange,
@@ -101,11 +102,28 @@ function switchToSelectionMode() {
   panningMouseButton.value = [1]
 }
 
+onSelectionDragStop((event: NodeDragEvent) => {
+  const nodes = event.nodes;
+  const payload: Array<{ id: string; position: { x: number; y: number } }> = nodes.map((node) => {
+    return {
+      id: node.id,
+      position: { x: node.position.x, y: node.position.y },
+    }
+  })
+  collaborationStore.notifyNodesMoved(payload)
+})
+
 onNodeDragStop((event) => {
   const id = event.node.id
   const newPosition = event.node.computedPosition
-  canvasStore.moveNode(id, { x: newPosition.x, y: newPosition.y })
+  canvasStore.moveNodes([
+    {
+      id,
+      position: { x: newPosition.x, y: newPosition.y },
+    },
+  ])
 })
+
 
 onConnect((event) => {
   canvasStore.connectNodes(

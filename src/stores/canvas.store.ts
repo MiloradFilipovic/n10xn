@@ -107,16 +107,18 @@ export const useCanvasStore = defineStore('CANVAS_STORE', () => {
     setUpdatedAt(new Date().toISOString())
   }
 
-  const moveNode = (nodeId: string, position: { x: number; y: number }) => {
+  const moveNodes = (payload: Array<{ id: string; position: { x: number; y: number } }>) => {
     const diagram = currentDiagram()
     if (!diagram) return
 
-    const node = diagram.nodes.find((node) => node.id === nodeId)
-    if (!node) return
-
-    node.position = position
+    payload.forEach(({ id, position }) => {
+      const node = diagram.nodes.find((node) => node.id === id)
+      if (node) {
+        node.position = position
+      }
+    })
     setUpdatedAt(new Date().toISOString())
-    collaborationStore.notifyNodeMoved(nodeId, position)
+    collaborationStore.notifyNodesMoved(payload)
   }
 
   const removeSelectedNodes = () => {
@@ -184,11 +186,11 @@ export const useCanvasStore = defineStore('CANVAS_STORE', () => {
     connectNodes({ id: newNode.id }, { id: targetNode.id })
     setUpdatedAt(new Date().toISOString())
     // And we also want to push downstream nodes to the right by 100px
-    diagram.nodes
-      .filter((node) => node.position.x > newNode.position.x)
-      .forEach((node) => {
-        moveNode(node.id, { x: node.position.x + distance * 2, y: node.position.y })
-      })
+      moveNodes(diagram.nodes
+      .filter((node) => node.position.x > newNode.position.x).map((node) => ({
+        id: node.id,
+        position: { x: node.position.x + distance * 2, y: node.position.y },
+      })))
   }
 
   const renameCurrentDiagram = (name: string) => {
@@ -216,7 +218,7 @@ export const useCanvasStore = defineStore('CANVAS_STORE', () => {
     addConnection,
     removeNode,
     removeConnection,
-    moveNode,
+    moveNodes,
     selectedNodes,
     selectedConnections,
     removeSelectedNodes,

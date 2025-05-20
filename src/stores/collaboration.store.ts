@@ -73,6 +73,17 @@ export const useCollaborationStore = defineStore('COLLABORATION_STORE', () => {
               }
             }
           }
+        } 
+        else if (change.action === 'add') {
+          const node = yNodes.get(key) as Node
+          if (!node || !node.id) return
+          // Add the new node to the current diagram
+          if (currentDiagram.value) {
+            const index = currentDiagram.value.nodes.findIndex((n) => n.id === key)
+            if (index === -1) {
+              currentDiagram.value.nodes.push(node)
+            }
+          }
         }
       })
     })
@@ -180,17 +191,9 @@ export const useCollaborationStore = defineStore('COLLABORATION_STORE', () => {
     yMetadata?.set('updatedAt', new Date().toISOString())
   }
 
-  const notifyNodeMoved = (nodeId: string, position: { x: number; y: number }) => {
-    const yNodes = document.value?.getMap('nodes')
-    const node = yNodes?.get(nodeId) as Node
-    if (node) {
-      node.position = position
-      yNodes?.set(nodeId, node)
-    }
-  }
-
   const notifyNodesMoved = (nodes: Array<{ id: string; position: { x: number; y: number } }>) => {
     const yNodes = document.value?.getMap('nodes')
+    // Package all updates in a single transaction
     document.value?.transact(() => {
       nodes.forEach(({ id, position }) => { 
         const node = yNodes?.get(id) as Node
@@ -200,6 +203,11 @@ export const useCollaborationStore = defineStore('COLLABORATION_STORE', () => {
         }
       }) 
     })
+  }
+
+  const notifyNodeAdded = (node: Node) => {
+    const yNodes = document.value?.getMap('nodes')
+    yNodes?.set(node.id, node)
   }
 
   return {
@@ -217,7 +225,7 @@ export const useCollaborationStore = defineStore('COLLABORATION_STORE', () => {
     otherUserCurrentlyEditingDiagramName,
     setEditingDiagramName,
     notifyDiagramNameChange,
-    notifyNodeMoved,
+    notifyNodeAdded,
     notifyNodesMoved,
   }
 })

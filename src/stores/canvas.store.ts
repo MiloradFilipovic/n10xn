@@ -68,6 +68,7 @@ export const useCanvasStore = defineStore('CANVAS_STORE', () => {
 
     diagram.nodes.push(newNode)
     setUpdatedAt(new Date().toISOString())
+    collaborationStore.notifyNodeAdded(newNode)
   }
 
   const getUniqueNodeName = (nodeType: NodeType) => {

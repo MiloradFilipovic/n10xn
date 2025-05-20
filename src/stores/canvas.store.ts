@@ -95,6 +95,7 @@ export const useCanvasStore = defineStore('CANVAS_STORE', () => {
 
     diagram.nodes.splice(index, 1)
     setUpdatedAt(new Date().toISOString())
+    collaborationStore.notifyNodeDeleted(nodeId)
   }
 
   const removeConnection = (connectionId: string) => {

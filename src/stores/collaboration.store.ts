@@ -43,7 +43,9 @@ export const useCollaborationStore = defineStore('COLLABORATION_STORE', () => {
     provider.value.awareness.on('change', handleAwarenessChange)
 
     if (!currentDiagram.value) return
-    // Init current diagram metadata
+    
+    // Init current diagram metadata and nodes
+    // TODO: Check if this is needed
     const yMetadata = document.value.getMap('metadata')
     if (!yMetadata.get('name')) {
       yMetadata.set('name', currentDiagram.value.name)
@@ -59,6 +61,7 @@ export const useCollaborationStore = defineStore('COLLABORATION_STORE', () => {
     // React to node changes
     yNodes.observe(event => {
       // Only react to changes by other users
+      // TODO: Check if this is working
       if (event.transaction.origin === provider.value?.awareness.clientID) return
       event.changes.keys.forEach((change, key) => {
         if (change.action === 'update') { 
@@ -73,8 +76,7 @@ export const useCollaborationStore = defineStore('COLLABORATION_STORE', () => {
               }
             }
           }
-        } 
-        else if (change.action === 'add') {
+        } else if (change.action === 'add') {
           const node = yNodes.get(key) as Node
           if (!node || !node.id) return
           // Add the new node to the current diagram
@@ -82,6 +84,14 @@ export const useCollaborationStore = defineStore('COLLABORATION_STORE', () => {
             const index = currentDiagram.value.nodes.findIndex((n) => n.id === key)
             if (index === -1) {
               currentDiagram.value.nodes.push(node)
+            }
+          }
+        } else if (change.action === 'delete') {
+          // Remove the node from the current diagram
+          if (currentDiagram.value) {
+            const index = currentDiagram.value.nodes.findIndex((n) => n.id === key)
+            if (index !== -1) {
+              currentDiagram.value.nodes.splice(index, 1)
             }
           }
         }
@@ -210,6 +220,11 @@ export const useCollaborationStore = defineStore('COLLABORATION_STORE', () => {
     yNodes?.set(node.id, node)
   }
 
+  const notifyNodeDeleted = (nodeId: string) => {
+    const yNodes = document.value?.getMap('nodes')
+    yNodes?.delete(nodeId)
+  }
+
   return {
     usersInSession,
     document,
@@ -227,5 +242,6 @@ export const useCollaborationStore = defineStore('COLLABORATION_STORE', () => {
     notifyDiagramNameChange,
     notifyNodeAdded,
     notifyNodesMoved,
+    notifyNodeDeleted,
   }
 })

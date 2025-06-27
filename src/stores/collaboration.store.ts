@@ -1,4 +1,4 @@
-import type { CollaborationUser, Node, User } from '@/types/canvas'
+import type { CollaborationUser, Connection, Node, User } from '@/types/canvas'
 import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
 import * as Y from 'yjs'
@@ -52,9 +52,13 @@ export const useCollaborationStore = defineStore('COLLABORATION_STORE', () => {
     }
 
     const yNodes = document.value.getMap('nodes')
+    const yConnections = document.value.getMap('connections')
     if (otherUsers.value.length === 0 && yNodes.size === 0) {
       currentDiagram.value.nodes.forEach((node) => {
         yNodes.set(node.id, node)
+      })
+      currentDiagram.value.connections.forEach((connection) => {
+        yConnections.set(connection.id, connection)
       })
     }
 
@@ -92,6 +96,44 @@ export const useCollaborationStore = defineStore('COLLABORATION_STORE', () => {
             const index = currentDiagram.value.nodes.findIndex((n) => n.id === key)
             if (index !== -1) {
               currentDiagram.value.nodes.splice(index, 1)
+            }
+          }
+        }
+      })
+    })
+
+    // React to connection changes
+    yConnections.observe(event => {
+      // Only react to changes by other users
+      if (event.transaction.origin === provider.value?.awareness.clientID) return
+      event.changes.keys.forEach((change, key) => {
+        if (change.action === 'update') {
+          const connection = yConnections.get(key) as Connection
+          if (connection) {
+            // Find the connection in the current diagram and replace it
+            if (currentDiagram.value) {
+              const index = currentDiagram.value.connections.findIndex((c) => c.id === key)
+              if (index !== undefined && index !== -1) {
+                currentDiagram.value.connections[index] = connection
+              }
+            }
+          }
+        } else if (change.action === 'add') {
+          const connection = yConnections.get(key) as Connection
+          if (!connection || !connection.id) return
+          // Add the new connection to the current diagram
+          if (currentDiagram.value) {
+            const index = currentDiagram.value.connections.findIndex((c) => c.id === key)
+            if (index === -1) {
+              currentDiagram.value.connections.push(connection)
+            }
+          }
+        } else if (change.action === 'delete') {
+          // Remove the connection from the current diagram
+          if (currentDiagram.value) {
+            const index = currentDiagram.value.connections.findIndex((c) => c.id === key)
+            if (index !== -1) {
+              currentDiagram.value.connections.splice(index, 1)
             }
           }
         }
@@ -225,6 +267,16 @@ export const useCollaborationStore = defineStore('COLLABORATION_STORE', () => {
     yNodes?.delete(nodeId)
   }
 
+  const notifyConnectionAdded = (connection: Connection) => {
+    const yConnections = document.value?.getMap('connections')
+    yConnections?.set(connection.id, connection)
+  }
+
+  const notifyConnectionDeleted = (connectionId: string) => {
+    const yConnections = document.value?.getMap('connections')
+    yConnections?.delete(connectionId)
+  }
+
   return {
     usersInSession,
     document,
@@ -243,5 +295,7 @@ export const useCollaborationStore = defineStore('COLLABORATION_STORE', () => {
     notifyNodeAdded,
     notifyNodesMoved,
     notifyNodeDeleted,
+    notifyConnectionAdded,
+    notifyConnectionDeleted,
   }
 })

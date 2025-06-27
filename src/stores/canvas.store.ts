@@ -84,6 +84,8 @@ export const useCanvasStore = defineStore('CANVAS_STORE', () => {
     if (!diagram) return
 
     diagram.connections.push(connection)
+    setUpdatedAt(new Date().toISOString())
+    collaborationStore.notifyConnectionAdded(connection)
   }
 
   const removeNode = (nodeId: string) => {
@@ -107,6 +109,7 @@ export const useCanvasStore = defineStore('CANVAS_STORE', () => {
 
     diagram.connections.splice(index, 1)
     setUpdatedAt(new Date().toISOString())
+    collaborationStore.notifyConnectionDeleted(connectionId)
   }
 
   const moveNodes = (payload: Array<{ id: string; position: { x: number; y: number } }>) => {

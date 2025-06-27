@@ -170,14 +170,14 @@ export const useCanvasStore = defineStore('CANVAS_STORE', () => {
     const sourceNode = diagram.nodes.find((node) => node.id === edge.source)
     const targetNode = diagram.nodes.find((node) => node.id === edge.target)
     if (!sourceNode || !targetNode) return
-    removeConnection(edge.id)
+    
     const newNodeName = `${getUniqueNodeName(nodeType)}`
     const newNode: Node = {
       id: new Date().getTime().toString(),
       type: nodeType.type,
       nodeType: nodeType.id,
       position: {
-        x: xPosition - distance,
+        x: (sourceNode.position.x + targetNode.position.x) / 2,
         y: (sourceNode.position.y + targetNode.position.y) / 2,
       },
       data: {
@@ -186,16 +186,54 @@ export const useCanvasStore = defineStore('CANVAS_STORE', () => {
         type: nodeType.id,
       },
     }
-    diagram.nodes.push(newNode)
-    connectNodes({ id: sourceNode.id }, { id: newNode.id })
-    connectNodes({ id: newNode.id }, { id: targetNode.id })
-    setUpdatedAt(new Date().toISOString())
-    // And we also want to push downstream nodes to the right by 100px
-      moveNodes(diagram.nodes
-      .filter((node) => node.position.x > newNode.position.x).map((node) => ({
+
+    // Create new connections
+    const newConnections: Connection[] = [
+      {
+        id: `${sourceNode.id}_${newNode.id}`,
+        sourceId: sourceNode.id,
+        targetId: newNode.id,
+      },
+      {
+        id: `${newNode.id}_${targetNode.id}`,
+        sourceId: newNode.id,
+        targetId: targetNode.id,
+      }
+    ]
+
+    // Calculate nodes to move
+    const nodesToMove = diagram.nodes
+      .filter((node) => node.position.x > newNode.position.x)
+      .map((node) => ({
         id: node.id,
         position: { x: node.position.x + distance * 2, y: node.position.y },
-      })))
+      }))
+
+    // Update local state
+    const connectionIndex = diagram.connections.findIndex((connection) => connection.id === edge.id)
+    if (connectionIndex !== -1) {
+      diagram.connections.splice(connectionIndex, 1)
+    }
+    diagram.nodes.push(newNode)
+    diagram.connections.push(...newConnections)
+    
+    // Update node positions
+    nodesToMove.forEach(({ id, position }) => {
+      const node = diagram.nodes.find((n) => n.id === id)
+      if (node) {
+        node.position = position
+      }
+    })
+
+    setUpdatedAt(new Date().toISOString())
+    
+    // Notify collaboration in a single transaction
+    collaborationStore.notifyNodeAddedOnEdge(
+      newNode,
+      edge.id,
+      newConnections,
+      nodesToMove
+    )
   }
 
   const renameCurrentDiagram = (name: string) => {

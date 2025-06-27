@@ -277,6 +277,39 @@ export const useCollaborationStore = defineStore('COLLABORATION_STORE', () => {
     yConnections?.delete(connectionId)
   }
 
+  const notifyNodeAddedOnEdge = (
+    nodeToAdd: Node,
+    connectionToRemove: string,
+    connectionsToAdd: Connection[],
+    nodesToMove: Array<{ id: string; position: { x: number; y: number } }>
+  ) => {
+    const yNodes = document.value?.getMap('nodes')
+    const yConnections = document.value?.getMap('connections')
+    
+    // Package all updates in a single transaction
+    document.value?.transact(() => {
+      // Remove the original connection
+      yConnections?.delete(connectionToRemove)
+      
+      // Add the new node
+      yNodes?.set(nodeToAdd.id, nodeToAdd)
+      
+      // Add the new connections
+      connectionsToAdd.forEach((connection) => {
+        yConnections?.set(connection.id, connection)
+      })
+      
+      // Move downstream nodes
+      nodesToMove.forEach(({ id, position }) => {
+        const node = yNodes?.get(id) as Node
+        if (node) {
+          node.position = position
+          yNodes?.set(id, node)
+        }
+      })
+    })
+  }
+
   return {
     usersInSession,
     document,
@@ -297,5 +330,6 @@ export const useCollaborationStore = defineStore('COLLABORATION_STORE', () => {
     notifyNodeDeleted,
     notifyConnectionAdded,
     notifyConnectionDeleted,
+    notifyNodeAddedOnEdge,
   }
 })

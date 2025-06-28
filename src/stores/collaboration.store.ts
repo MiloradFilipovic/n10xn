@@ -28,7 +28,6 @@ export const useCollaborationStore = defineStore('COLLABORATION_STORE', () => {
   const usersInSession = ref<Record<number, CollaborationUser>>({})
   const cursorPosition = ref<{ x: number; y: number } | null>(null)
   const clientId = ref<number | null>(null)
-  const isLocalTransaction = ref(false)
 
   const document = ref<Y.Doc | null>(null)
   const provider = ref<YSweetProvider | null>(null)
@@ -63,60 +62,75 @@ export const useCollaborationStore = defineStore('COLLABORATION_STORE', () => {
     const yNodes = document.value.getMap('nodes')
     const yConnections = document.value.getMap('connections')
     
-    // Wait for initial sync before seeding data
+    // Wait briefly for initial provider setup, then proceed with sync logic
     setTimeout(() => {
       // Only seed if this is the first user and there's no existing data
       const hasExistingData = yNodes.size > 0 || yConnections.size > 0 || yMetadata.get('name')
       const isFirstUser = Object.keys(usersInSession.value).length <= 1
       
       if (!hasExistingData && isFirstUser && currentDiagram.value) {
-        isLocalTransaction.value = true
-        document.value?.transact(() => {
-          // Set metadata
-          yMetadata.set('name', currentDiagram.value!.name)
-          yMetadata.set('updatedAt', currentDiagram.value!.updatedAt)
-          
-          // Set nodes
-          currentDiagram.value!.nodes.forEach((node) => {
-            yNodes.set(node.id, { ...node })
-          })
-          
-          // Set connections
-          currentDiagram.value!.connections.forEach((connection) => {
-            yConnections.set(connection.id, { ...connection })
-          })
-        })
-        isLocalTransaction.value = false
+        try {
+          document.value?.transact(() => {
+            // Set metadata
+            yMetadata.set('name', currentDiagram.value!.name)
+            yMetadata.set('updatedAt', currentDiagram.value!.updatedAt)
+            
+            // Set nodes
+            currentDiagram.value!.nodes.forEach((node) => {
+              yNodes.set(node.id, { ...node })
+            })
+            
+            // Set connections
+            currentDiagram.value!.connections.forEach((connection) => {
+              yConnections.set(connection.id, { ...connection })
+            })
+          }, 'initial-sync')
+        } catch (error) {
+          console.error('Error during initial sync:', error)
+        }
       }
-    }, 100) // Small delay to allow for initial awareness sync
+    }, 200) // Small delay to allow for initial awareness sync
 
-    // React to node changes with optimized batching
+    // React to node changes
     yNodes.observe(event => {
-      // Only react to changes by other users
-      if (event.transaction.local || isLocalTransaction.value) return
+      // Only react to changes by other users (check for local transaction origins)
+      if (event.transaction.local) return
       
       try {
-        // Batch all changes to reduce DOM updates
+        // Batch all changes to reduce DOM updates using Y.js event.changes.keys
         const updates: Node[] = []
         const additions: Node[] = []
         const deletions: string[] = []
         
-        event.changes.keys.forEach((change, key) => {
-          if (change.action === 'update') { 
-            const node = yNodes.get(key) as Node
-            if (node) updates.push(node)
-          } else if (change.action === 'add') {
-            const node = yNodes.get(key) as Node
-            if (node && node.id) additions.push(node)
-          } else if (change.action === 'delete') {
-            deletions.push(key)
+        for (const [key, change] of event.changes.keys) {
+          switch (change.action) {
+            case 'update': {
+              const node = yNodes.get(key) as Node
+              if (node) updates.push(node)
+              break
+            }
+            case 'add': {
+              const node = yNodes.get(key) as Node
+              if (node?.id) additions.push(node)
+              break
+            }
+            case 'delete': {
+              deletions.push(key)
+              break
+            }
           }
-        })
+        }
         
         // Apply all changes in batch
-        updates.forEach(node => canvasStore.updateNodeFromRemote(node))
-        additions.forEach(node => canvasStore.addNodeFromRemote(node))
-        deletions.forEach(nodeId => canvasStore.removeNodeFromRemote(nodeId))
+        if (updates.length > 0) {
+          updates.forEach(node => canvasStore.updateNodeFromRemote(node))
+        }
+        if (additions.length > 0) {
+          additions.forEach(node => canvasStore.addNodeFromRemote(node))
+        }
+        if (deletions.length > 0) {
+          deletions.forEach(nodeId => canvasStore.removeNodeFromRemote(nodeId))
+        }
       } catch (error) {
         console.error('Error handling node changes:', error)
       }
@@ -124,28 +138,43 @@ export const useCollaborationStore = defineStore('COLLABORATION_STORE', () => {
 
     // React to connection changes
     yConnections.observe(event => {
-      if (event.transaction.local || isLocalTransaction.value) return
+      if (event.transaction.local) return
       
       try {
         const updates: Connection[] = []
         const additions: Connection[] = []
         const deletions: string[] = []
         
-        event.changes.keys.forEach((change, key) => {
-          if (change.action === 'update') {
-            const connection = yConnections.get(key) as Connection
-            if (connection) updates.push(connection)
-          } else if (change.action === 'add') {
-            const connection = yConnections.get(key) as Connection
-            if (connection && connection.id) additions.push(connection)
-          } else if (change.action === 'delete') {
-            deletions.push(key)
+        // Use Y.js optimized change detection
+        for (const [key, change] of event.changes.keys) {
+          switch (change.action) {
+            case 'update': {
+              const connection = yConnections.get(key) as Connection
+              if (connection) updates.push(connection)
+              break
+            }
+            case 'add': {
+              const connection = yConnections.get(key) as Connection
+              if (connection?.id) additions.push(connection)
+              break
+            }
+            case 'delete': {
+              deletions.push(key)
+              break
+            }
           }
-        })
+        }
         
-        updates.forEach(connection => canvasStore.updateConnectionFromRemote(connection))
-        additions.forEach(connection => canvasStore.addConnectionFromRemote(connection))
-        deletions.forEach(connectionId => canvasStore.removeConnectionFromRemote(connectionId))
+        // Apply all changes in batch
+        if (updates.length > 0) {
+          updates.forEach(connection => canvasStore.updateConnectionFromRemote(connection))
+        }
+        if (additions.length > 0) {
+          additions.forEach(connection => canvasStore.addConnectionFromRemote(connection))
+        }
+        if (deletions.length > 0) {
+          deletions.forEach(connectionId => canvasStore.removeConnectionFromRemote(connectionId))
+        }
       } catch (error) {
         console.error('Error handling connection changes:', error)
       }
@@ -154,24 +183,27 @@ export const useCollaborationStore = defineStore('COLLABORATION_STORE', () => {
     // React to metadata changes
     yMetadata.observe(event => {
       try {
-        event.changes.keys.forEach((change, key) => {
+        // Use Y.js optimized change detection for metadata
+        for (const [key, change] of event.changes.keys) {
           if (change.action === 'update') {
             switch (key) {
-              case 'name':
+              case 'name': {
                 const name = yMetadata.get('name') as string
                 if (name) {
                   canvasStore.renameCurrentDiagram(name)
                 }
                 break
-              case 'updatedAt':
+              }
+              case 'updatedAt': {
                 const updatedAt = yMetadata.get('updatedAt') as string
                 if (updatedAt) {
                   canvasStore.setUpdatedAt(updatedAt)
                 }
                 break
+              }
             }
           }
-        })
+        }
       } catch (error) {
         console.error('Error handling metadata changes:', error)
       }
@@ -195,7 +227,6 @@ export const useCollaborationStore = defineStore('COLLABORATION_STORE', () => {
     usersInSession.value = {}
     cursorPosition.value = null
     clientId.value = null
-    isLocalTransaction.value = false
   }
 
   const handleAwarenessChange = () => {
@@ -268,55 +299,76 @@ export const useCollaborationStore = defineStore('COLLABORATION_STORE', () => {
 
   const notifyDiagramNameChange = (name: string) => {
     const yMetadata = document.value?.getMap('metadata')
-    isLocalTransaction.value = true
-    yMetadata?.set('name', name)
-    yMetadata?.set('updatedAt', new Date().toISOString())
-    isLocalTransaction.value = false
+    try {
+      document.value?.transact(() => {
+        yMetadata?.set('name', name)
+        yMetadata?.set('updatedAt', new Date().toISOString())
+      }, 'diagram-name-change')
+    } catch (error) {
+      console.error('Error updating diagram name:', error)
+    }
   }
 
   const notifyNodesMoved = (nodes: Array<{ id: string; position: { x: number; y: number } }>) => {
     const yNodes = document.value?.getMap('nodes')
-    // Package all updates in a single transaction
-    isLocalTransaction.value = true
-    document.value?.transact(() => {
-      nodes.forEach(({ id, position }) => { 
-        const node = yNodes?.get(id) as Node
-        if (node) {
-          // Shallow copy the node and update its position (TODO: Will need to deep copy if adding more properties)
-          const updatedNode = { ...node, position: { ...position } }
-          yNodes?.set(id, updatedNode)
-        }
-      }) 
-    })
-    isLocalTransaction.value = false
+    try {
+      document.value?.transact(() => {
+        nodes.forEach(({ id, position }) => { 
+          const node = yNodes?.get(id) as Node
+          if (node) {
+            // Shallow copy the node and update its position (TODO: Will need to deep copy if adding more properties)
+            const updatedNode = { ...node, position: { ...position } }
+            yNodes?.set(id, updatedNode)
+          }
+        }) 
+      }, 'nodes-move')
+    } catch (error) {
+      console.error('Error moving nodes:', error)
+    }
   }
 
   const notifyNodeAdded = (node: Node) => {
     const yNodes = document.value?.getMap('nodes')
-    isLocalTransaction.value = true
-    yNodes?.set(node.id, node)
-    isLocalTransaction.value = false
+    try {
+      document.value?.transact(() => {
+        yNodes?.set(node.id, node)
+      }, 'node-add')
+    } catch (error) {
+      console.error('Error adding node:', error)
+    }
   }
 
   const notifyNodeDeleted = (nodeId: string) => {
     const yNodes = document.value?.getMap('nodes')
-    isLocalTransaction.value = true
-    yNodes?.delete(nodeId)
-    isLocalTransaction.value = false
+    try {
+      document.value?.transact(() => {
+        yNodes?.delete(nodeId)
+      }, 'node-delete')
+    } catch (error) {
+      console.error('Error deleting node:', error)
+    }
   }
 
   const notifyConnectionAdded = (connection: Connection) => {
     const yConnections = document.value?.getMap('connections')
-    isLocalTransaction.value = true
-    yConnections?.set(connection.id, connection)
-    isLocalTransaction.value = false
+    try {
+      document.value?.transact(() => {
+        yConnections?.set(connection.id, connection)
+      }, 'connection-add')
+    } catch (error) {
+      console.error('Error adding connection:', error)
+    }
   }
 
   const notifyConnectionDeleted = (connectionId: string) => {
     const yConnections = document.value?.getMap('connections')
-    isLocalTransaction.value = true
-    yConnections?.delete(connectionId)
-    isLocalTransaction.value = false
+    try {
+      document.value?.transact(() => {
+        yConnections?.delete(connectionId)
+      }, 'connection-delete')
+    } catch (error) {
+      console.error('Error deleting connection:', error)
+    }
   }
 
   const notifyNodeAddedOnEdge = (
@@ -328,29 +380,31 @@ export const useCollaborationStore = defineStore('COLLABORATION_STORE', () => {
     const yNodes = document.value?.getMap('nodes')
     const yConnections = document.value?.getMap('connections')
     
-    isLocalTransaction.value = true
-    document.value?.transact(() => {
-      // Remove the original connection
-      yConnections?.delete(connectionToRemove)
-      
-      // Add the new node
-      yNodes?.set(nodeToAdd.id, nodeToAdd)
-      
-      // Add the new connections
-      connectionsToAdd.forEach((connection) => {
-        yConnections?.set(connection.id, connection)
-      })
-      
-      // Move downstream nodes
-      nodesToMove.forEach(({ id, position }) => {
-        const node = yNodes?.get(id) as Node
-        if (node) {
-          const updatedNode = { ...node, position: { ...position } }
-          yNodes?.set(id, updatedNode)
-        }
-      })
-    })
-    isLocalTransaction.value = false
+    try {
+      document.value?.transact(() => {
+        // Remove the original connection
+        yConnections?.delete(connectionToRemove)
+        
+        // Add the new node
+        yNodes?.set(nodeToAdd.id, nodeToAdd)
+        
+        // Add the new connections
+        connectionsToAdd.forEach((connection) => {
+          yConnections?.set(connection.id, connection)
+        })
+        
+        // Move downstream nodes
+        nodesToMove.forEach(({ id, position }) => {
+          const node = yNodes?.get(id) as Node
+          if (node) {
+            const updatedNode = { ...node, position: { ...position } }
+            yNodes?.set(id, updatedNode)
+          }
+        })
+      }, 'node-add-on-edge')
+    } catch (error) {
+      console.error('Error adding node on edge:', error)
+    }
   }
 
   return {

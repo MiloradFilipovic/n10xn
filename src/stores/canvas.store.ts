@@ -163,7 +163,7 @@ export const useCanvasStore = defineStore('CANVAS_STORE', () => {
     setUpdatedAt(new Date().toISOString())
   }
 
-  const addNodeOnEdge = (nodeType: NodeType, edge: Edge, xPosition: number) => {
+  const addNodeOnEdge = (nodeType: NodeType, edge: Edge) => {
     const distance = 50
     const diagram = currentDiagram()
     if (!diagram) return

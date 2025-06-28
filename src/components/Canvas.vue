@@ -9,12 +9,14 @@ import { onKeyDown, onKeyUp } from '@vueuse/core'
 import IfNode from './nodes/IfNode.vue'
 import TriggerNode from './nodes/TriggerNode.vue'
 import RegularNode from './nodes/RegularNode.vue'
+import EdgeContextMenu from './EdgeContextMenu.vue'
 import { useDevice } from '@/composables/useDevice'
 import { NODE_TYPES } from '../../db/nodeTypes'
 import { useNodeTypesStore } from '@/stores/nodeTypes.store'
 import { useUsersStore } from '@/stores/users.store'
 import { useRouter } from 'vue-router'
 import { useCollaborationStore } from '@/stores/collaboration.store'
+import type { NodeType } from '@/types/common'
 
 type Props = {
   diagramId: string
@@ -40,6 +42,10 @@ const {
 } = useVueFlow()
 const device = useDevice()
 const router = useRouter()
+
+const contextMenuVisible = ref(false)
+const contextMenuPosition = ref({ x: 0, y: 0 })
+const contextMenuEdge = ref<Edge | null>(null)
 
 const panningKeyCode = ref<string[]>([' ', device.controlKeyCode.value])
 const panningMouseButton = ref<number[]>([1])
@@ -153,11 +159,30 @@ onEdgesChange((updates) => {
 })
 
 onEdgeContextMenu((event) => {
-  // TODO: Make this prettier and address ts error
-  const httpRequestNodeType = nodeTypesStore.allNodeTypes[NODE_TYPES[2].id]
-  // @ts-expect-error
-  canvasStore.addNodeOnEdge(httpRequestNodeType, event.edge, event.event.clientX)
+  event.event.preventDefault()
+  contextMenuVisible.value = true
+  let x = 0
+  let y = 0
+  if ('clientX' in event.event && 'clientY' in event.event) {
+    x = event.event.clientX
+    y = event.event.clientY
+  } else if ('touches' in event.event && event.event.touches.length > 0) {
+    x = event.event.touches[0].clientX
+    y = event.event.touches[0].clientY
+  }
+  contextMenuPosition.value = { x, y }
+  contextMenuEdge.value = event.edge
 })
+
+const handleNodeTypeSelected = (nodeType: NodeType, edge: Edge) => {
+  canvasStore.addNodeOnEdge(nodeType, edge)
+  closeContextMenu()
+}
+
+const closeContextMenu = () => {
+  contextMenuVisible.value = false
+  contextMenuEdge.value = null
+}
 
 onKeyDown(panningKeyCode.value, switchToPanningMode, {
   dedupe: true,
@@ -215,6 +240,13 @@ onMounted(() => {
         <RegularNode :data="props" />
       </template>
     </VueFlow>
+    <EdgeContextMenu
+      :visible="contextMenuVisible"
+      :position="contextMenuPosition"
+      :edge="contextMenuEdge"
+      @close="closeContextMenu"
+      @node-type-selected="handleNodeTypeSelected"
+    />
   </div>
 </template>
 

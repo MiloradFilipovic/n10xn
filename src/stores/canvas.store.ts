@@ -249,6 +249,67 @@ export const useCanvasStore = defineStore('CANVAS_STORE', () => {
     diagram.updatedAt = time
   }
 
+  // Methods for handling remote updates from collaboration (don't trigger notifications)
+  const updateNodeFromRemote = (node: Node) => {
+    const diagram = currentDiagram()
+    if (!diagram) return
+    
+    const index = diagram.nodes.findIndex((n) => n.id === node.id)
+    if (index !== -1) {
+      diagram.nodes[index] = { ...node }
+    }
+  }
+
+  const addNodeFromRemote = (node: Node) => {
+    const diagram = currentDiagram()
+    if (!diagram) return
+    
+    const exists = diagram.nodes.some((n) => n.id === node.id)
+    if (!exists) {
+      diagram.nodes.push({ ...node })
+    }
+  }
+
+  const removeNodeFromRemote = (nodeId: string) => {
+    const diagram = currentDiagram()
+    if (!diagram) return
+    
+    const index = diagram.nodes.findIndex((n) => n.id === nodeId)
+    if (index !== -1) {
+      diagram.nodes.splice(index, 1)
+    }
+  }
+
+  const updateConnectionFromRemote = (connection: Connection) => {
+    const diagram = currentDiagram()
+    if (!diagram) return
+    
+    const index = diagram.connections.findIndex((c) => c.id === connection.id)
+    if (index !== -1) {
+      diagram.connections[index] = { ...connection }
+    }
+  }
+
+  const addConnectionFromRemote = (connection: Connection) => {
+    const diagram = currentDiagram()
+    if (!diagram) return
+    
+    const exists = diagram.connections.some((c) => c.id === connection.id)
+    if (!exists) {
+      diagram.connections.push({ ...connection })
+    }
+  }
+
+  const removeConnectionFromRemote = (connectionId: string) => {
+    const diagram = currentDiagram()
+    if (!diagram) return
+    
+    const index = diagram.connections.findIndex((c) => c.id === connectionId)
+    if (index !== -1) {
+      diagram.connections.splice(index, 1)
+    }
+  }
+
   return {
     allDiagrams,
     createNewDiagram,
@@ -270,5 +331,12 @@ export const useCanvasStore = defineStore('CANVAS_STORE', () => {
     renameCurrentDiagram,
     addNodeOnEdge,
     setUpdatedAt,
+    // Remote update methods
+    updateNodeFromRemote,
+    addNodeFromRemote,
+    removeNodeFromRemote,
+    updateConnectionFromRemote,
+    addConnectionFromRemote,
+    removeConnectionFromRemote,
   }
 })

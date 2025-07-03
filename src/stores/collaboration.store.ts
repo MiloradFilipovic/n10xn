@@ -91,123 +91,127 @@ export const useCollaborationStore = defineStore('COLLABORATION_STORE', () => {
             console.error('Error during initial sync:', error)
           }
         }
-        // React to node changes
-        yNodes.observe(event => {
-          // Only react to changes by other users (check for local transaction origins)
-          if (event.transaction.local) return
-          
-          try {
-            // Batch all changes to reduce DOM updates using Y.js event.changes.keys
-            const updates: Node[] = []
-            const additions: Node[] = []
-            const deletions: string[] = []
-            
-            for (const [key, change] of event.changes.keys) {
-              switch (change.action) {
-                case 'update': {
-                  const node = yNodes.get(key) as Node
-                  if (node) updates.push(node)
-                  break
-                }
-                case 'add': {
-                  const node = yNodes.get(key) as Node
-                  if (node?.id) additions.push(node)
-                  break
-                }
-                case 'delete': {
-                  deletions.push(key)
-                  break
-                }
-              }
-            }
-            
-            // Apply all changes in batch
-            if (updates.length > 0) {
-              updates.forEach(node => canvasStore.updateNodeFromRemote(node))
-            }
-            if (additions.length > 0) {
-              additions.forEach(node => canvasStore.addNodeFromRemote(node))
-            }
-            if (deletions.length > 0) {
-              deletions.forEach(nodeId => canvasStore.removeNodeFromRemote(nodeId))
-            }
-          } catch (error) {
-            console.error('Error handling node changes:', error)
-          }
-        })
+        initObservers(yNodes, yConnections, yMetadata)
+      }
+    })
+  }
 
-        // React to connection changes
-        yConnections.observe(event => {
-          if (event.transaction.local) return
-          
-          try {
-            const updates: Connection[] = []
-            const additions: Connection[] = []
-            const deletions: string[] = []
-            
-            // Use Y.js optimized change detection
-            for (const [key, change] of event.changes.keys) {
-              switch (change.action) {
-                case 'update': {
-                  const connection = yConnections.get(key) as Connection
-                  if (connection) updates.push(connection)
-                  break
-                }
-                case 'add': {
-                  const connection = yConnections.get(key) as Connection
-                  if (connection?.id) additions.push(connection)
-                  break
-                }
-                case 'delete': {
-                  deletions.push(key)
-                  break
-                }
-              }
+  const initObservers = (yNodes: Y.Map<unknown>, yConnections: Y.Map<unknown>, yMetadata: Y.Map<unknown>) => {
+    // React to node changes
+    yNodes.observe(event => {
+      // Only react to changes by other users (check for local transaction origins)
+      if (event.transaction.local) return
+      
+      try {
+        // Batch all changes to reduce DOM updates using Y.js event.changes.keys
+        const updates: Node[] = []
+        const additions: Node[] = []
+        const deletions: string[] = []
+        
+        for (const [key, change] of event.changes.keys) {
+          switch (change.action) {
+            case 'update': {
+              const node = yNodes.get(key) as Node
+              if (node) updates.push(node)
+              break
             }
-            
-            // Apply all changes in batch
-            if (updates.length > 0) {
-              updates.forEach(connection => canvasStore.updateConnectionFromRemote(connection))
+            case 'add': {
+              const node = yNodes.get(key) as Node
+              if (node?.id) additions.push(node)
+              break
             }
-            if (additions.length > 0) {
-              additions.forEach(connection => canvasStore.addConnectionFromRemote(connection))
+            case 'delete': {
+              deletions.push(key)
+              break
             }
-            if (deletions.length > 0) {
-              deletions.forEach(connectionId => canvasStore.removeConnectionFromRemote(connectionId))
-            }
-          } catch (error) {
-            console.error('Error handling connection changes:', error)
           }
-        })
+        }
+        
+        // Apply all changes in batch
+        if (updates.length > 0) {
+          updates.forEach(node => canvasStore.updateNodeFromRemote(node))
+        }
+        if (additions.length > 0) {
+          additions.forEach(node => canvasStore.addNodeFromRemote(node))
+        }
+        if (deletions.length > 0) {
+          deletions.forEach(nodeId => canvasStore.removeNodeFromRemote(nodeId))
+        }
+      } catch (error) {
+        console.error('Error handling node changes:', error)
+      }
+    })
 
-        // React to metadata changes
-        yMetadata.observe(event => {
-          try {
-            // Use Y.js optimized change detection for metadata
-            for (const [key, change] of event.changes.keys) {
-              if (change.action === 'update') {
-                switch (key) {
-                  case 'name': {
-                    const name = yMetadata.get('name') as string
-                    if (name) {
-                      canvasStore.renameCurrentDiagram(name)
-                    }
-                    break
-                  }
-                  case 'updatedAt': {
-                    const updatedAt = yMetadata.get('updatedAt') as string
-                    if (updatedAt) {
-                      canvasStore.setUpdatedAt(updatedAt)
-                    }
-                    break
-                  }
+    // React to connection changes
+    yConnections.observe(event => {
+      if (event.transaction.local) return
+      
+      try {
+        const updates: Connection[] = []
+        const additions: Connection[] = []
+        const deletions: string[] = []
+        
+        // Use Y.js optimized change detection
+        for (const [key, change] of event.changes.keys) {
+          switch (change.action) {
+            case 'update': {
+              const connection = yConnections.get(key) as Connection
+              if (connection) updates.push(connection)
+              break
+            }
+            case 'add': {
+              const connection = yConnections.get(key) as Connection
+              if (connection?.id) additions.push(connection)
+              break
+            }
+            case 'delete': {
+              deletions.push(key)
+              break
+            }
+          }
+        }
+        
+        // Apply all changes in batch
+        if (updates.length > 0) {
+          updates.forEach(connection => canvasStore.updateConnectionFromRemote(connection))
+        }
+        if (additions.length > 0) {
+          additions.forEach(connection => canvasStore.addConnectionFromRemote(connection))
+        }
+        if (deletions.length > 0) {
+          deletions.forEach(connectionId => canvasStore.removeConnectionFromRemote(connectionId))
+        }
+      } catch (error) {
+        console.error('Error handling connection changes:', error)
+      }
+    })
+
+    // React to metadata changes
+    yMetadata.observe(event => {
+      try {
+        // Use Y.js optimized change detection for metadata
+        for (const [key, change] of event.changes.keys) {
+          if (change.action === 'update') {
+            switch (key) {
+              case 'name': {
+                const name = yMetadata.get('name') as string
+                if (name) {
+                  canvasStore.renameCurrentDiagram(name)
                 }
+                break
+              }
+              case 'updatedAt': {
+                const updatedAt = yMetadata.get('updatedAt') as string
+                if (updatedAt) {
+                  canvasStore.setUpdatedAt(updatedAt)
+                }
+                break
               }
             }
-          } catch (error) {
-            console.error('Error handling metadata changes:', error)
           }
-        })
+        }
+      } catch (error) {
+        console.error('Error handling metadata changes:', error)
       }
     })
   }

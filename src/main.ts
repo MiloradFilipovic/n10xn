@@ -19,6 +19,7 @@ import DiagramList from './views/Home.vue'
 import Editor from './views/Editor.vue'
 import Login from './views/Login.vue'
 import { useUsersStore } from './stores/users.store'
+import { ComponentMonitorPlugin } from './plugins/vue-flow-vis'
 
 const routes = [
   { path: '/', name: 'login', component: Login, meta: { onlyAnonymous: true } },
@@ -35,6 +36,17 @@ const app = createApp(App)
 
 app.use(router)
 app.use(createPinia())
+
+app.use(ComponentMonitorPlugin, {
+  // excludeComponents: ['RouterView', 'Transition'],
+  performanceThreshold: 16,
+  groupByComponent: false,
+  trackMounts: false,
+  trackRenderCycles: true,
+  logToTable: false,
+  logToConsole: true,
+  enabled: true,
+})
 
 // TODO: Move this to a separate file
 library.add(faClock)

@@ -1,5 +1,5 @@
-export { ComponentMonitorPlugin } from './plugin'
-export { ComponentMonitorPlugin as default } from './plugin'
+export { FlowVisPlugin } from './plugin'
+export { FlowVisPlugin as default } from './plugin'
 
 export { ComponentMonitor } from './core/ComponentMonitor'
 export { ComponentIdentifier } from './utils/componentIdentifier'

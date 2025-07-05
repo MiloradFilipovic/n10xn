@@ -1,5 +1,5 @@
 import type { 
-  ComponentMonitorOptions, 
+  FlowVisOptions, 
   RenderEventData, 
   Logger,
   ComponentMetadata 
@@ -7,16 +7,15 @@ import type {
 import { ConsoleLogger } from '../utils/logger'
 
 export class ComponentMonitor {
-  public options: Required<ComponentMonitorOptions>
+  public options: Required<FlowVisOptions>
   private logger: Logger
   private renderCounts = new Map<string, number>()
   private lastRenderTime = new Map<string, number>()
   
-  constructor(options: ComponentMonitorOptions = {}) {
+  constructor(options: FlowVisOptions = {}) {
     this.options = {
       enabled: true,
-      logToConsole: true,
-      logToTable: true,
+      logToTable: false,
       excludeComponents: [],
       includeComponents: [],
       trackRenderCycles: true,
@@ -72,12 +71,10 @@ export class ComponentMonitor {
       this.lastRenderTime.set(data.componentName, now)
       
       // Log the event
-      if (this.options.logToConsole) {
-        if (type === 'tracked') {
-          this.logger.tracked(data)
-        } else {
-          this.logger.triggered(data)
-        }
+      if (type === 'tracked') {
+        this.logger.tracked(data)
+      } else {
+        this.logger.triggered(data)
       }
       
       // Custom callbacks

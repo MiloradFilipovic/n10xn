@@ -1,6 +1,6 @@
 import { getCurrentInstance, onRenderTracked, onRenderTriggered } from 'vue'
 import type { App, Plugin, DebuggerEvent } from 'vue'
-import type { ComponentMonitorOptions } from '../types'
+import type { FlowVisOptions } from '../types'
 import { ComponentMonitor } from '../core/ComponentMonitor'
 import { ComponentIdentifier } from '../utils/componentIdentifier'
 
@@ -10,11 +10,11 @@ declare module '@vue/runtime-core' {
   }
 }
 
-export const ComponentMonitorPlugin: Plugin<ComponentMonitorOptions> = {
-  install(app: App, options: ComponentMonitorOptions = {}) {
+export const FlowVisPlugin: Plugin<FlowVisOptions> = {
+  install(app: App, options: FlowVisOptions = {}) {
     // Only enable in development
     if (import.meta.env.PROD) {
-      console.warn('ComponentMonitorPlugin is disabled in production')
+      console.warn('FlowVisPlugin is disabled in production')
       return
     }
     

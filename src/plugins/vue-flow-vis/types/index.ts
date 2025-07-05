@@ -3,9 +3,8 @@ import type { DebuggerEvent } from 'vue'
 export type RenderTrackedEvent = DebuggerEvent
 export type RenderTriggeredEvent = DebuggerEvent
 
-export type ComponentMonitorOptions = {
+export type FlowVisOptions = {
   enabled?: boolean
-  logToConsole?: boolean
   logToTable?: boolean
   excludeComponents?: string[]
   includeComponents?: string[]
